@@ -5,13 +5,6 @@ import Image from "next/image";
 import styles from "../styles/Home.module.css";
 
 const Home: NextPage = () => {
-  const x = 1;
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  function dddd(): void {
-    // eslint-disable-next-line no-console
-    console.log(x);
-  }
-
   return (
     <div className={styles.container}>
       <Head>
