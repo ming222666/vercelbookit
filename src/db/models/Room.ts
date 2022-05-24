@@ -30,24 +30,24 @@ const roomSchema = new mongoose.Schema({
     required: [true, 'Please enter number of beds in room'],
   },
   isAvailInternet: {
-    type: Boolean,
-    default: false,
+    type: Number,
+    default: 0,
   },
   isAvailBreakfast: {
-    type: Boolean,
-    default: false,
+    type: Number,
+    default: 0,
   },
   isAvailAirConditioned: {
-    type: Boolean,
-    default: false,
+    type: Number,
+    default: 0,
   },
   isAvailRoomCleaning: {
-    type: Boolean,
-    default: false,
+    type: Number,
+    default: 0,
   },
   isAllowedPets: {
-    type: Boolean,
-    default: false,
+    type: Number,
+    default: 0,
   },
   rating: {
     type: Number,
