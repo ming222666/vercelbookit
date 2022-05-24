@@ -1,16 +1,18 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
 
 import db from '../db/db';
-import { IRoomDummyDto, IRoomDto } from '../db/interfaces';
+import { IRoomDto } from '../db/interfaces';
 import Room from '../db/models/Room';
 
 interface ExtendedNextApiRequestNewRoom extends NextApiRequest {
   body: IRoomDto;
 }
 
-const allRooms = async (req: NextApiRequest, res: NextApiResponse<IRoomDummyDto>): Promise<void> => {
-  // await db.connect();
-  res.status(200).json({ message: 'All Rooms' });
+const allRooms = async (req: NextApiRequest, res: NextApiResponse<IRoomDto[]>): Promise<void> => {
+  await db.connect();
+  const rooms: IRoomDto[] = await Room.find().lean();
+  await db.disconnect();
+  res.send(rooms);
 };
 
 // Create new room => /api/rooms
