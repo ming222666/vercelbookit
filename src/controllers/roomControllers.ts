@@ -1,7 +1,7 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
 
 import db from '../db/db';
-import { IRoomDto } from '../db/interfaces';
+import { IRoomDto, IErrormsgStatusDto } from '../db/interfaces';
 import Room from '../db/models/Room';
 
 interface ExtendedNextApiRequestNewRoom extends NextApiRequest {
@@ -26,4 +26,19 @@ const newRoom = async (req: ExtendedNextApiRequestNewRoom, res: NextApiResponse<
   res.status(201).send(room);
 };
 
-export { allRooms, newRoom };
+// Get room details => /api/rooms/:id
+const getSingleRoom = async (
+  req: NextApiRequest,
+  res: NextApiResponse<IRoomDto | IErrormsgStatusDto>,
+): Promise<void> => {
+  await db.connect();
+  const room: IRoomDto = await Room.findById(req.query.id).lean();
+  if (!room) {
+    await db.disconnect();
+    res.status(404).send({ errormsg: 'Room not found with this ID', status: 404 });
+    return;
+  }
+  await db.disconnect();
+  res.send(room);
+};
+export { allRooms, newRoom, getSingleRoom };
