@@ -87,7 +87,11 @@ const roomSchema = new mongoose.Schema({
   ],
   user: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: false }, // required: true
   createdAt: {
-    type: Date,
+    type: Number,
+    default: Date.now,
+  },
+  updatedAt: {
+    type: Number,
     default: Date.now,
   },
 });

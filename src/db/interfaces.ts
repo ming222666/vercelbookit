@@ -41,5 +41,6 @@ export interface IRoomDto {
     },
   ];
   user: string;
-  createdAt: Date;
+  createdAt: number;
+  updatedAt: number;
 }
