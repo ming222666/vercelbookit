@@ -21,7 +21,7 @@ const newRoom = async (req: ExtendedNextApiRequestRoom, res: NextApiResponse<IRo
   const newRm = new Room({
     ...req.body,
   });
-  const room: IRoomDto = await newRm.save();
+  const room = await newRm.save();
   await db.disconnect();
   res.status(201).send(room);
 };
@@ -48,7 +48,7 @@ const updateRoom = async (
   res: NextApiResponse<IRoomDto | IErrormsgStatusDto>,
 ): Promise<void> => {
   await db.connect();
-  const room: IRoomDto = await Room.findById(req.query.id).lean();
+  const room = await Room.findById(req.query.id);
   if (!room) {
     await db.disconnect();
     res.status(404).send({ errormsg: 'Room not found with this ID', status: 404 });
@@ -63,4 +63,21 @@ const updateRoom = async (
   res.status(200).send(roomToUpdate);
 };
 
-export { allRooms, newRoom, getSingleRoom, updateRoom };
+// Delete room => /api/rooms/:id
+const deleteRoom = async (
+  req: NextApiRequest,
+  res: NextApiResponse<{ status: number } | IErrormsgStatusDto>,
+): Promise<void> => {
+  await db.connect();
+  const room = await Room.findById(req.query.id);
+  if (!room) {
+    await db.disconnect();
+    res.status(404).send({ errormsg: 'Room not found with this ID', status: 404 });
+    return;
+  }
+  await room.remove();
+  await db.disconnect();
+  res.status(200).send({ status: 200 });
+};
+
+export { allRooms, newRoom, getSingleRoom, updateRoom, deleteRoom };
