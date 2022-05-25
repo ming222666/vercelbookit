@@ -9,17 +9,26 @@ export async function onError(err: any, req: any, res: NextApiResponse<IErrormsg
   /* eslint-disable no-console */
   console.log('onError->errormsg', err.message);
   console.log('onError->err.name', err.name);
-  // console.log('onError->err', err);
+  console.log('onError->err', err);
   console.log('onError->req.url', req.url);
   console.log('onError->req.method', req.method);
   console.log('onError->req.body', req.body);
   /* eslint-enable no-console */
 
-  if (err.name !== 'CastError') {
-    res.status(500).send({ errormsg: err.message, status: 500 });
+  let status = 400;
+  let errormsg = '';
+  const errName = err.name;
+
+  if (errName === 'CastError') {
+    errormsg = `Resource not found. Invalid: ${err.path}`;
+  } else if (errName === 'ValidationError') {
+    const firstValidationError = err.errors[Object.keys(err.errors)[0]].message;
+    errormsg = firstValidationError;
   } else {
-    res.status(400).send({ errormsg: `Resource not found. Invalid: ${err.path}`, status: 400 });
+    errormsg = err.message;
+    status = 500;
   }
+  res.status(status).send({ errormsg, status });
 }
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
