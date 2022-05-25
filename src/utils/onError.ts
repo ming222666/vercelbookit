@@ -1,6 +1,6 @@
 import { NextApiResponse } from 'next';
 
-import db from './db';
+import db from '../db/db';
 import { IErrormsgStatusDto } from '../db/interfaces';
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any, @typescript-eslint/no-unused-vars
