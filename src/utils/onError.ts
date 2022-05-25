@@ -8,14 +8,18 @@ export async function onError(err: any, req: any, res: NextApiResponse<IErrormsg
   await db.disconnect();
   /* eslint-disable no-console */
   console.log('onError->errormsg', err.message);
-  console.log('onError->err', err);
+  console.log('onError->err.name', err.name);
+  // console.log('onError->err', err);
   console.log('onError->req.url', req.url);
   console.log('onError->req.method', req.method);
   console.log('onError->req.body', req.body);
   /* eslint-enable no-console */
 
-  const status = 500;
-  res.status(status).send({ errormsg: err.message, status });
+  if (err.name !== 'CastError') {
+    res.status(500).send({ errormsg: err.message, status: 500 });
+  } else {
+    res.status(400).send({ errormsg: `Resource not found. Invalid: ${err.path}`, status: 400 });
+  }
 }
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
