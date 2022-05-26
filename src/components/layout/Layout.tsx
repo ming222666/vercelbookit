@@ -4,11 +4,7 @@ import Head from 'next/head';
 import Header from './Header';
 import Footer from './Footer';
 
-export default function Layout(props: {
-  children: React.ReactNode;
-  title?: string;
-  description?: string;
-}): JSX.Element {
+export function Layout(props: { children: React.ReactNode; title?: string; description?: string }): JSX.Element {
   return (
     <div>
       <Head>
