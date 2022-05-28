@@ -35,7 +35,7 @@ const getSingleRoom = async (
   const room: IRoomDto = await Room.findById(req.query.id).lean();
   if (!room) {
     await db.disconnect();
-    res.status(404).send({ errormsg: 'Room not found with this ID', status: 404 });
+    res.status(404).json({ errormsg: 'Room not found with this ID', status: 404 });
     return;
   }
   await db.disconnect();
@@ -51,7 +51,7 @@ const updateRoom = async (
   const room = await Room.findById(req.query.id);
   if (!room) {
     await db.disconnect();
-    res.status(404).send({ errormsg: 'Room not found with this ID', status: 404 });
+    res.status(404).json({ errormsg: 'Room not found with this ID', status: 404 });
     return;
   }
   const roomToUpdate: IRoomDto = await Room.findByIdAndUpdate(req.query.id, req.body, {
@@ -72,12 +72,12 @@ const deleteRoom = async (
   const room = await Room.findById(req.query.id);
   if (!room) {
     await db.disconnect();
-    res.status(404).send({ errormsg: 'Room not found with this ID', status: 404 });
+    res.status(404).json({ errormsg: 'Room not found with this ID', status: 404 });
     return;
   }
   await room.remove();
   await db.disconnect();
-  res.status(200).send({ status: 200 });
+  res.status(200).json({ status: 200 });
 };
 
 export { allRooms, newRoom, getSingleRoom, updateRoom, deleteRoom };

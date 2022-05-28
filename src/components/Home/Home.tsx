@@ -1,9 +1,14 @@
 import React from 'react';
 
+import { useSelector } from 'react-redux';
+
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 import styles from './Home.module.css';
+import { AppState } from '../../store';
 
 export function Home(): JSX.Element {
+  const { rooms } = useSelector((state: AppState) => state.allRooms);
+
   return (
     // <section id="rooms" className={styles.popo + ' container mt-5'}>
     <section id="rooms" className="container mt-5">
