@@ -12,6 +12,7 @@ export interface IRoomDtodddd {
 }
 
 export interface IRoomDto {
+  _id: string;
   name: string;
   pricePerNight: number;
   description: string;
