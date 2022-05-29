@@ -10,6 +10,7 @@
   },
   "dependencies": {
     "axios": "0.26.1",
+    "cloudinary": "1.29.1",
     "mongoose": "6.3.2",
     "next": "12.1.6",
     "next-absolute-url": "^1.2.2",
