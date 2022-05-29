@@ -30,10 +30,12 @@ export const getServerSideProps = wrapper.getServerSideProps(
       const x = await (store.dispatch as ThunkDispatch<AllRoomsState, undefined, AllRoomsAction>)(getRooms(ctx.req));
 
       // eslint-disable-next-line no-console
-      console.log('x', x);
+      console.log('xxxxxxxxxxxxxxxxxxxxxx');
+      // eslint-disable-next-line no-console
+      /* console.log('x', x);
       if (x instanceof Error) {
         // store.dispatch( some action for React-Toast)
-      }
+      } */
 
       return {
         props: {},

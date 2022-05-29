@@ -1,11 +1,19 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { useSelector } from 'react-redux';
+
+// import { toast } from 'react-toastify';
 
 import { AppState } from '../../store';
 import { RoomItem } from './room';
 
 export function Home(): JSX.Element {
   const { rooms } = useSelector((state: AppState) => state.allRooms);
+
+  useEffect(() => {
+    // toast.success('retgetretre');
+    // eslint-disable-next-line no-console
+    console.log('useEffect Home compo');
+  }, []);
 
   return (
     <section id="rooms" className="container mt-5">
