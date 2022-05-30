@@ -8,6 +8,7 @@ import { wrapper } from '../store';
 import { getRooms } from '../store/ducks/allRooms/action';
 import { AllRoomsAction } from '../store/ducks/allRooms/types';
 import { AllRoomsState } from '../store/ducks/allRooms/models/AllRoomsState';
+import { ExceptionErrorActionType } from '../store/ducks/exceptionError/types';
 
 const HomePage: NextPage = () => {
   return (
@@ -30,12 +31,13 @@ export const getServerSideProps = wrapper.getServerSideProps(
       const x = await (store.dispatch as ThunkDispatch<AllRoomsState, undefined, AllRoomsAction>)(getRooms(ctx.req));
 
       // eslint-disable-next-line no-console
-      console.log('xxxxxxxxxxxxxxxxxxxxxx');
-      // eslint-disable-next-line no-console
-      /* console.log('x', x);
+      console.log('x', x);
       if (x instanceof Error) {
-        // store.dispatch( some action for React-Toast)
-      } */
+        store.dispatch({
+          type: ExceptionErrorActionType.SET_ERROR,
+          payload: x.message,
+        });
+      }
 
       return {
         props: {},

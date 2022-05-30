@@ -1,16 +1,29 @@
 import React, { useEffect } from 'react';
-import { useSelector } from 'react-redux';
+import { useSelector, useDispatch } from 'react-redux';
 
 import { toast } from 'react-toastify';
 
 import { AppState } from '../../store';
 import { RoomItem } from './room';
+import { ExceptionErrorActionType } from '../../store/ducks/exceptionError/types';
 
 export function Home(): JSX.Element {
-  const { rooms } = useSelector((state: AppState) => state.allRooms);
+  const { rooms, error } = useSelector((state: AppState) => state.allRooms);
+  const exceptionError = useSelector((state: AppState) => state.exceptionError);
+  const dispatch = useDispatch();
 
   useEffect(() => {
-    toast.success('test toast');
+    if (error) {
+      toast.error(error.errormsg);
+    }
+    if (exceptionError) {
+      toast.error(exceptionError, {
+        onClose: () => {
+          dispatch({ type: ExceptionErrorActionType.CLEAR_ERROR });
+        },
+      });
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   return (
