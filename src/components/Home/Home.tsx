@@ -10,7 +10,7 @@ export function Home(): JSX.Element {
   const { rooms } = useSelector((state: AppState) => state.allRooms);
 
   useEffect(() => {
-    toast.success('retgetretre');
+    toast.success('test toast');
   }, []);
 
   return (

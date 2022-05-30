@@ -35,3 +35,5 @@ yarn-error.log*
 
 # typescript
 *.tsbuildinfo
+
+DO-NOT-DEL-why-sticking-to-react18-not-17.txt
