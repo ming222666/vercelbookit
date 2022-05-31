@@ -28,7 +28,7 @@ export interface IRoomDto {
   numOfReviews: number;
   images: [
     {
-      public: string;
+      public_id: string;
       url: string;
     },
   ];

@@ -1,4 +1,5 @@
 import React from 'react';
+import Link from 'next/Link';
 
 export function Header(): JSX.Element {
   return (
@@ -6,8 +7,10 @@ export function Header(): JSX.Element {
       <div className="container">
         <div className="col-3 p-0">
           <div className="navbar-brand">
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img style={{ cursor: 'pointer' }} src="./images/bookit_logo.png" alt="BookIT" />
+            <Link href="/">
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img style={{ cursor: 'pointer' }} src="/images/bookit_logo.png" alt="BookIT" />
+            </Link>
           </div>
         </div>
 
