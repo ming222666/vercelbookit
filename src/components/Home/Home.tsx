@@ -1,33 +1,17 @@
-import React, { useEffect } from 'react';
+import React from 'react';
 import { useSelector, useDispatch } from 'react-redux';
-
-import { toast } from 'react-toastify';
 
 import { AppState } from '../../store';
 import { RoomItem } from './room';
-import { clearError } from '../../store/ducks/exceptionError/action';
+
+import useErrormsgStatusDtoAndExceptionError from '../../hooks/useErrormsgStatusDtoAndExceptionError';
 
 export function Home(): JSX.Element {
   const { rooms, error } = useSelector((state: AppState) => state.allRooms);
   const exceptionError = useSelector((state: AppState) => state.exceptionError);
   const dispatch = useDispatch();
 
-  useEffect(() => {
-    if (error) {
-      toast.error(error.errormsg);
-    }
-  }, [error]);
-
-  useEffect(() => {
-    if (exceptionError) {
-      toast.error(exceptionError, {
-        onClose: () => {
-          dispatch(clearError());
-        },
-      });
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [exceptionError]);
+  useErrormsgStatusDtoAndExceptionError(error, exceptionError, dispatch);
 
   return (
     <section id="rooms" className="container mt-5">
