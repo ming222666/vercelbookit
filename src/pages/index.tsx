@@ -27,7 +27,6 @@ export const getServerSideProps = wrapper.getServerSideProps(
     }> => {
       // https://stackoverflow.com/questions/64857870/how-to-dispatch-thunkaction-with-redux-thunk-and-typescript
       /* await store.dispatch(getRooms(ctx.req)); */
-      // eslint-disable-next-line @typescript-eslint/no-unused-vars
       const x = await (store.dispatch as ThunkDispatch<AllRoomsState, undefined, AllRoomsAction>)(getRooms(ctx.req));
 
       // eslint-disable-next-line no-console

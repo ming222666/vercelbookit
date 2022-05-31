@@ -13,7 +13,7 @@ export function RoomItem(props: { room: IRoomDto }): JSX.Element {
         <img className="card-img-top mx-auto" src={room.images[0].url} height={170} alt="Room" />
         <div className="card-body d-flex flex-column">
           <h5 className="card-title">
-            <Link href={`/room/${room._id}`}>
+            <Link href={`/rooms/${room._id}`}>
               <a>{room.name}</a>
             </Link>
           </h5>
@@ -35,7 +35,7 @@ export function RoomItem(props: { room: IRoomDto }): JSX.Element {
           </div>
 
           <button className="btn btn-block view-btn">
-            <Link href={`/room/${room._id}`}>View Details</Link>
+            <Link href={`/rooms/${room._id}`}>View Details</Link>
           </button>
         </div>
       </div>
