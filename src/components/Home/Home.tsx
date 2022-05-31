@@ -5,7 +5,7 @@ import { toast } from 'react-toastify';
 
 import { AppState } from '../../store';
 import { RoomItem } from './room';
-import { ExceptionErrorActionType } from '../../store/ducks/exceptionError/types';
+import { clearError } from '../../store/ducks/exceptionError/action';
 
 export function Home(): JSX.Element {
   const { rooms, error } = useSelector((state: AppState) => state.allRooms);
@@ -19,7 +19,7 @@ export function Home(): JSX.Element {
     if (exceptionError) {
       toast.error(exceptionError, {
         onClose: () => {
-          dispatch({ type: ExceptionErrorActionType.CLEAR_ERROR });
+          dispatch(clearError());
         },
       });
     }
