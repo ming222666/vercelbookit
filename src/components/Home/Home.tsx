@@ -22,8 +22,21 @@ export function Home(): JSX.Element {
   let { page = 1, location } = router.query;
   page = Number(page);
 
+  let queryParams: URLSearchParams | null = null;
+  if (typeof window !== 'undefined') {
+    queryParams = new URLSearchParams(window.location.search);
+  }
+
   const handlePagination = (pageNumber: number): void => {
-    router.push(`/?page=${pageNumber}`);
+    if (queryParams) {
+      if (queryParams.has('page')) {
+        queryParams.set('page', pageNumber + '');
+      } else {
+        queryParams.append('page', pageNumber + '');
+      }
+    }
+
+    router.replace({ search: queryParams?.toString() });
   };
 
   let count = roomsCount;
