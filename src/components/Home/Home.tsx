@@ -1,6 +1,7 @@
 import React from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { useRouter } from 'next/router';
+import Link from 'next/Link';
 
 import Pagination from 'react-js-pagination';
 
@@ -17,21 +18,29 @@ export function Home(): JSX.Element {
   useErrormsgStatusDtoAndExceptionError(error, exceptionError, dispatch);
 
   const router = useRouter();
-  let { page = 1 } = router.query;
+  // eslint-disable-next-line prefer-const
+  let { page = 1, location } = router.query;
   page = Number(page);
 
   const handlePagination = (pageNumber: number): void => {
     router.push(`/?page=${pageNumber}`);
   };
 
+  let count = roomsCount;
+  if (location) {
+    count = filteredRoomsCount;
+  }
+
   return (
     <>
       <section id="rooms" className="container mt-5">
-        <h2 className="mb-3 ml-2 stays-heading">Stays in New York</h2>
+        <h2 className="mb-3 ml-2 stays-heading">{location ? `Rooms in ${location}` : 'All Rooms'}</h2>
 
-        <a href="#" className="ml-2 back-to-search">
-          <i className="fa fa-arrow-left"></i> Back to Search
-        </a>
+        <Link href="/search">
+          <a className="ml-2 back-to-search">
+            <i className="fa fa-arrow-left"></i> Back to Search{' '}
+          </a>
+        </Link>
         <div className="row">
           {rooms.length === 0 ? (
             <div className="alert alert-danger">
@@ -43,12 +52,12 @@ export function Home(): JSX.Element {
         </div>
       </section>
 
-      {resPerPage < roomsCount && (
+      {resPerPage < count && (
         <div className="d-flex justify-content-center mt-5">
           <Pagination
             activePage={page}
             itemsCountPerPage={resPerPage}
-            totalItemsCount={roomsCount}
+            totalItemsCount={count}
             onChange={handlePagination}
             nextPageText="Next"
             prevPageText="Prev"
