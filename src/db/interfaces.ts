@@ -45,3 +45,10 @@ export interface IRoomDto {
   createdAt: number;
   updatedAt: number;
 }
+
+export interface IAllRoomsDto {
+  roomsCount: number;
+  resPerPage: number;
+  filteredRoomsCount: number;
+  rooms: IRoomDto[];
+}

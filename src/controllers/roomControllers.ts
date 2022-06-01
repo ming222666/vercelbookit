@@ -1,18 +1,36 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
 
 import db from '../db/db';
-import { IRoomDto, IErrormsgStatusDto } from '../db/interfaces';
+import { IRoomDto, IErrormsgStatusDto, IAllRoomsDto } from '../db/interfaces';
 import Room from '../db/models/Room';
+import APIFeatures from '../utils/apiFeatures';
 
 interface ExtendedNextApiRequestRoom extends NextApiRequest {
   body: IRoomDto;
 }
 
-const allRooms = async (req: NextApiRequest, res: NextApiResponse<IRoomDto[]>): Promise<void> => {
+const allRooms = async (req: NextApiRequest, res: NextApiResponse<IAllRoomsDto>): Promise<void> => {
   await db.connect();
-  const rooms: IRoomDto[] = await Room.find().lean();
+
+  const resPerPage = 4;
+  const roomsCount = await Room.countDocuments();
+
+  const apiFeatures = new APIFeatures(Room.find(), req.query).search().filter();
+
+  let rooms: IRoomDto[] = await apiFeatures.query.lean();
+  const filteredRoomsCount = rooms.length;
+
+  apiFeatures.pagination(resPerPage);
+  rooms = await apiFeatures.query.clone().lean();
+
   await db.disconnect();
-  res.status(200).send(rooms);
+  // res.status(200).send(rooms);
+  res.status(200).send({
+    roomsCount,
+    resPerPage,
+    filteredRoomsCount,
+    rooms,
+  });
 };
 
 // Create new room => /api/rooms

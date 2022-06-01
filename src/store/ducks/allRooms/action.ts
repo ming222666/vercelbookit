@@ -5,7 +5,7 @@ import absoluteUrl from 'next-absolute-url';
 
 import { AllRoomsAction, AllRoomsActionType } from './types';
 import { AllRoomsState } from './models/AllRoomsState';
-import { IRoomDto } from '../../../db/interfaces';
+import { IAllRoomsDto } from '../../../db/interfaces';
 import { getError } from '../../../utils/getAxiosError';
 
 // Get all rooms
@@ -15,7 +15,7 @@ export const getRooms =
     try {
       const { origin } = absoluteUrl(req);
 
-      const { data } = await axios.get<IRoomDto[]>(`${origin}/api/rooms`);
+      const { data } = await axios.get<IAllRoomsDto>(`${origin}/api/rooms`);
 
       return dispatch({
         type: AllRoomsActionType.ALL_ROOMS_SUCCESS,

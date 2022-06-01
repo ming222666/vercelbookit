@@ -1,6 +1,6 @@
-import { IRoomDto, IErrormsgStatusDto } from '../../../../db/interfaces';
+import { IAllRoomsDto } from '../../../../db/interfaces';
+import { IErrormsgStatusDto } from '../../../../db/interfaces';
 
-export type AllRoomsState = {
-  rooms: IRoomDto[];
+export interface AllRoomsState extends IAllRoomsDto {
   error: IErrormsgStatusDto | null;
-};
+}

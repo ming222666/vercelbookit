@@ -1,5 +1,5 @@
 import { BaseAction } from '../../BaseAction';
-import { IRoomDto, IErrormsgStatusDto } from '../../../db/interfaces';
+import { IAllRoomsDto, IErrormsgStatusDto } from '../../../db/interfaces';
 
 export enum AllRoomsActionType {
   ALL_ROOMS_FAIL = 'allRooms/ALL_ROOMS_FAIL',
@@ -9,7 +9,7 @@ export enum AllRoomsActionType {
 
 export interface GetAllRoomsSuccessAction extends BaseAction {
   type: AllRoomsActionType.ALL_ROOMS_SUCCESS;
-  payload: IRoomDto[];
+  payload: IAllRoomsDto;
 }
 
 export interface GetAllRoomsFailAction extends BaseAction {
