@@ -28,7 +28,13 @@ export const getServerSideProps = wrapper.getServerSideProps(
       // https://stackoverflow.com/questions/64857870/how-to-dispatch-thunkaction-with-redux-thunk-and-typescript
       /* await store.dispatch(getRooms(ctx.req)); */
       const x = await (store.dispatch as ThunkDispatch<AllRoomsState, undefined, AllRoomsAction>)(
-        getRooms(ctx.req, ctx.query['page'] as string, ctx.query['location'] as string),
+        getRooms(
+          ctx.req,
+          ctx.query['page'] as string,
+          ctx.query['location'] as string,
+          ctx.query['guests'] as string,
+          ctx.query['category'] as string,
+        ),
       );
 
       // eslint-disable-next-line no-console

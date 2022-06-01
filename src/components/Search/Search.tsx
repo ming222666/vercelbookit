@@ -3,6 +3,8 @@ import { useRouter } from 'next/router';
 
 export function Search(): JSX.Element {
   const [location, setLocation] = useState('');
+  const [guests, setGuests] = useState('');
+  const [category, setCategory] = useState('');
 
   const router = useRouter();
 
@@ -10,7 +12,7 @@ export function Search(): JSX.Element {
     e.preventDefault();
 
     if (location.trim()) {
-      router.push(`/?location=${location.trim()}`);
+      router.push(`/?location=${location.trim()}&guests=${guests}&category=${category}`);
     } else {
       router.push('/');
     }
@@ -34,25 +36,38 @@ export function Search(): JSX.Element {
               />
             </div>
 
-            {/* <div className="form-group">
+            <div className="form-group">
               <label htmlFor="guest_field">No. of Guests</label>
-              <select className="form-control" id="guest_field" value="">
+              <select
+                className="form-control"
+                id="guest_field"
+                value={guests}
+                onChange={(e): void => setGuests(e.target.value)}
+              >
+                <option></option>
                 <option>1</option>
                 <option>2</option>
                 <option>3</option>
                 <option>4</option>
                 <option>5</option>
+                <option>6</option>
               </select>
             </div>
 
             <div className="form-group">
               <label htmlFor="room_type_field">Room Type</label>
-              <select className="form-control" id="room_type_field" value="">
+              <select
+                className="form-control"
+                id="room_type_field"
+                value={category}
+                onChange={(e): void => setCategory(e.target.value)}
+              >
+                <option></option>
                 <option>King</option>
                 <option>Single</option>
                 <option>Twins</option>
               </select>
-            </div> */}
+            </div>
 
             <button type="submit" className="btn btn-block py-2">
               Search

@@ -10,12 +10,17 @@ import { getError } from '../../../utils/getAxiosError';
 
 // Get all rooms
 export const getRooms =
-  (req: IncomingMessage, page = '1', location = '') =>
+  (req: IncomingMessage, page = '1', location = '', guests: string, category: string) =>
   async (dispatch: ThunkDispatch<AllRoomsState, undefined, AllRoomsAction>): Promise<AllRoomsAction | Error> => {
     try {
       const { origin } = absoluteUrl(req);
 
-      const { data } = await axios.get<IAllRoomsDto>(`${origin}/api/rooms?page=${page}&location=${location}`);
+      let link = `${origin}/api/rooms?page=${page}&location=${location}`;
+
+      if (guests) link = link.concat(`&guestCapacity=${guests}`);
+      if (category) link = link.concat(`&category=${category}`);
+
+      const { data } = await axios.get<IAllRoomsDto>(link);
 
       return dispatch({
         type: AllRoomsActionType.ALL_ROOMS_SUCCESS,
