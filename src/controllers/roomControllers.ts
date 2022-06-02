@@ -6,10 +6,6 @@ import Room from '../db/models/Room';
 import APIFeatures from '../utils/apiFeatures';
 import IWithBodyNextApiRequest from './interfaces';
 
-// interface IWithBodyNextApiRequest<B> extends NextApiRequest {
-//   body: B;
-// }
-
 type RoomNextApiRequest = IWithBodyNextApiRequest<IRoomDto>;
 
 const allRooms = async (req: NextApiRequest, res: NextApiResponse<IAllRoomsDto>): Promise<void> => {

@@ -52,3 +52,22 @@ export interface IAllRoomsDto {
   filteredRoomsCount: number;
   rooms: IRoomDto[];
 }
+
+/**
+ * User
+ */
+export interface IUserDto {
+  _id?: string;
+  name: string;
+  email: string;
+  password?: string;
+  avator: {
+    public_id: string;
+    url: string;
+  };
+  role: string;
+  createdAt?: number;
+  updatedAt?: number;
+  resetPasswordToken?: string;
+  resetPasswordExpire?: number;
+}
