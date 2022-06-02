@@ -4,10 +4,13 @@ import db from '../db/db';
 import { IRoomDto, IErrormsgStatusDto, IAllRoomsDto } from '../db/interfaces';
 import Room from '../db/models/Room';
 import APIFeatures from '../utils/apiFeatures';
+import IWithBodyNextApiRequest from './interfaces';
 
-interface ExtendedNextApiRequestRoom extends NextApiRequest {
-  body: IRoomDto;
-}
+// interface IWithBodyNextApiRequest<B> extends NextApiRequest {
+//   body: B;
+// }
+
+type RoomNextApiRequest = IWithBodyNextApiRequest<IRoomDto>;
 
 const allRooms = async (req: NextApiRequest, res: NextApiResponse<IAllRoomsDto>): Promise<void> => {
   await db.connect();
@@ -34,7 +37,7 @@ const allRooms = async (req: NextApiRequest, res: NextApiResponse<IAllRoomsDto>)
 };
 
 // Create new room => /api/rooms
-const newRoom = async (req: ExtendedNextApiRequestRoom, res: NextApiResponse<IRoomDto>): Promise<void> => {
+const newRoom = async (req: RoomNextApiRequest, res: NextApiResponse<IRoomDto>): Promise<void> => {
   await db.connect();
   const newRm = new Room({
     ...req.body,
@@ -62,7 +65,7 @@ const getSingleRoom = async (
 
 // Update room details => /api/rooms/:id
 const updateRoom = async (
-  req: ExtendedNextApiRequestRoom,
+  req: RoomNextApiRequest,
   res: NextApiResponse<IRoomDto | IErrormsgStatusDto>,
 ): Promise<void> => {
   await db.connect();
