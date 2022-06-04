@@ -61,11 +61,11 @@ export interface IUserDto {
   name: string;
   email: string;
   password?: string;
-  avator: {
+  avatar: {
     public_id: string;
     url: string;
   };
-  role: string;
+  role?: string;
   createdAt?: number;
   updatedAt?: number;
   resetPasswordToken?: string;

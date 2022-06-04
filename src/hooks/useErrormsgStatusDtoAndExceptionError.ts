@@ -5,7 +5,7 @@ import { Dispatch } from 'redux';
 import { toast } from 'react-toastify';
 
 import { IErrormsgStatusDto } from '../db/interfaces';
-import { clearError } from '../store/ducks/exceptionError/action';
+import { clearExceptionError } from '../store/ducks/exceptionError/action';
 
 export default function useErrormsgStatusDtoAndExceptionError(
   errormsgStatus: IErrormsgStatusDto | null,
@@ -22,11 +22,8 @@ export default function useErrormsgStatusDtoAndExceptionError(
 
   useEffect(() => {
     if (exceptionError) {
-      toast.error(exceptionError, {
-        onClose: () => {
-          dispatch(clearError());
-        },
-      });
+      toast.error(exceptionError);
+      dispatch(clearExceptionError());
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [exceptionError]);

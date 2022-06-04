@@ -24,6 +24,14 @@ export async function onError(err: any, req: any, res: NextApiResponse<IErrormsg
   } else if (errName === 'ValidationError') {
     const firstValidationError = err.errors[Object.keys(err.errors)[0]].message;
     errormsg = firstValidationError;
+  } else if (errName === 'MongoServerError') {
+    if (err.code === 11000) {
+      const keyValue = err.keyValue; // e.g. { email: 'existingEmail@xxx.com' }
+      const key = Object.keys(keyValue)[0];
+      const keyCapitalize = key.charAt(0).toUpperCase() + key.slice(1);
+      errormsg = keyCapitalize + ' is already in use!';
+      status = 400;
+    }
   } else {
     errormsg = err.message;
     status = 500;

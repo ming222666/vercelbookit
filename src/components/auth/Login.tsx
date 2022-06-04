@@ -1,15 +1,20 @@
 import React, { useState } from 'react';
-// import Head from 'next/head';
+import Link from 'next/Link';
 import { signIn } from 'next-auth/react';
 
 import { toast } from 'react-toastify';
 
+import ButtonLoader from '../Layout/ButtonLoader';
+
 export default function Login(): JSX.Element {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [loading, setLoading] = useState(false);
 
   const submitHandler = async (e: React.SyntheticEvent<Element, Event>): Promise<void> => {
     e.preventDefault();
+
+    setLoading(true);
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const result = await signIn<any>('credentials', {
@@ -17,6 +22,8 @@ export default function Login(): JSX.Element {
       email,
       password,
     });
+
+    setLoading(false);
 
     if (result && result.error) {
       toast.error(result.error);
@@ -57,13 +64,13 @@ export default function Login(): JSX.Element {
               Forgot Password?
             </a>
 
-            <button id="login_button" type="submit" className="btn btn-block py-3">
-              LOGIN
+            <button id="login_button" type="submit" className="btn btn-block py-3" disabled={loading}>
+              {loading ? <ButtonLoader /> : 'LOGIN'}
             </button>
 
-            <a href="#" className="float-right mt-3">
-              New User?
-            </a>
+            <Link href="/register">
+              <a className="float-right mt-3">New User?</a>
+            </Link>
           </form>
         </div>
       </div>
