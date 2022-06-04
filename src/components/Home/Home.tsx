@@ -1,21 +1,23 @@
-import React from 'react';
-import { useSelector, useDispatch } from 'react-redux';
+import React, { useEffect } from 'react';
+import { useSelector } from 'react-redux';
 import { useRouter } from 'next/router';
 import Link from 'next/Link';
 
+import { toast } from 'react-toastify';
 import Pagination from 'react-js-pagination';
 
 import { AppState } from '../../store';
 import { RoomItem } from './room';
 
-import useErrormsgStatusDtoAndExceptionError from '../../hooks/useErrormsgStatusDtoAndExceptionError';
-
 export function Home(): JSX.Element {
   const { rooms, resPerPage, roomsCount, filteredRoomsCount, error } = useSelector((state: AppState) => state.allRooms);
-  const exceptionError = useSelector((state: AppState) => state.exceptionError);
-  const dispatch = useDispatch();
 
-  useErrormsgStatusDtoAndExceptionError(error, exceptionError, dispatch);
+  useEffect((): void => {
+    if (error) {
+      toast.error(error.errormsg);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [error]);
 
   const router = useRouter();
   // eslint-disable-next-line prefer-const

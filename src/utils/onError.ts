@@ -1,10 +1,10 @@
 import { NextApiResponse } from 'next';
 
 import db from '../db/db';
-import { IErrormsgStatusDto } from '../db/interfaces';
+import { IErrorDto } from '../db/interfaces';
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any, @typescript-eslint/no-unused-vars
-export async function onError(err: any, req: any, res: NextApiResponse<IErrormsgStatusDto>, next: any): Promise<void> {
+export async function onError(err: any, req: any, res: NextApiResponse<IErrorDto>, next: any): Promise<void> {
   await db.disconnect();
   /* eslint-disable no-console */
   console.log('onError->errormsg', err.message);
@@ -30,7 +30,6 @@ export async function onError(err: any, req: any, res: NextApiResponse<IErrormsg
       const key = Object.keys(keyValue)[0];
       const keyCapitalize = key.charAt(0).toUpperCase() + key.slice(1);
       errormsg = keyCapitalize + ' is already in use!';
-      status = 400;
     }
   } else {
     errormsg = err.message;
@@ -40,7 +39,7 @@ export async function onError(err: any, req: any, res: NextApiResponse<IErrormsg
 }
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-export function onNoMatch(req: any, res: NextApiResponse<IErrormsgStatusDto>): void {
+export function onNoMatch(req: any, res: NextApiResponse<IErrorDto>): void {
   const errormsg = `Method '${req.method}' Not Allowed`;
 
   /* eslint-disable no-console */

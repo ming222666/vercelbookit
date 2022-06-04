@@ -1,10 +1,14 @@
 import { BaseAction } from '../../BaseAction';
-import { IAllRoomsDto, IErrormsgStatusDto } from '../../../db/interfaces';
+import { IAllRoomsDto, IErrorDto } from '../../../db/interfaces';
 
 export enum AllRoomsActionType {
+  ALL_ROOMS_REQUEST = 'allRooms/ALL_ROOMS_REQUEST',
   ALL_ROOMS_FAIL = 'allRooms/ALL_ROOMS_FAIL',
   ALL_ROOMS_SUCCESS = 'allRooms/ALL_ROOMS_SUCCESS',
-  CLEAR_ERRORS = 'allRooms/CLEAR_ERRORS',
+}
+
+export interface AllRoomsRequestAction extends BaseAction {
+  type: AllRoomsActionType.ALL_ROOMS_REQUEST;
 }
 
 export interface GetAllRoomsSuccessAction extends BaseAction {
@@ -14,11 +18,7 @@ export interface GetAllRoomsSuccessAction extends BaseAction {
 
 export interface GetAllRoomsFailAction extends BaseAction {
   type: AllRoomsActionType.ALL_ROOMS_FAIL;
-  payload: IErrormsgStatusDto;
+  payload: IErrorDto;
 }
 
-export interface GetAllRoomsClearErrorsAction extends BaseAction {
-  type: AllRoomsActionType.CLEAR_ERRORS;
-}
-
-export type AllRoomsAction = GetAllRoomsSuccessAction | GetAllRoomsFailAction | GetAllRoomsClearErrorsAction;
+export type AllRoomsAction = AllRoomsRequestAction | GetAllRoomsSuccessAction | GetAllRoomsFailAction;

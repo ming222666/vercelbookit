@@ -1,7 +1,7 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
 
 import db from '../db/db';
-import { IRoomDto, IErrormsgStatusDto, IAllRoomsDto } from '../db/interfaces';
+import { IRoomDto, IErrorDto, IAllRoomsDto } from '../db/interfaces';
 import Room from '../db/models/Room';
 import APIFeatures from '../utils/apiFeatures';
 import IWithBodyNextApiRequest from './interfaces/IWithBodyNextApiRequest';
@@ -23,7 +23,6 @@ const allRooms = async (req: NextApiRequest, res: NextApiResponse<IAllRoomsDto>)
   rooms = await apiFeatures.query.clone().lean();
 
   await db.disconnect();
-  // res.status(200).send(rooms);
   res.status(200).send({
     roomsCount,
     resPerPage,
@@ -44,15 +43,15 @@ const newRoom = async (req: RoomNextApiRequest, res: NextApiResponse<IRoomDto>):
 };
 
 // Get room details => /api/rooms/:id
-const getSingleRoom = async (
-  req: NextApiRequest,
-  res: NextApiResponse<IRoomDto | IErrormsgStatusDto>,
-): Promise<void> => {
+const getSingleRoom = async (req: NextApiRequest, res: NextApiResponse<IRoomDto | IErrorDto>): Promise<void> => {
   await db.connect();
   const room: IRoomDto = await Room.findById(req.query.id).lean();
   if (!room) {
     await db.disconnect();
-    res.status(404).json({ errormsg: 'Room not found with this ID', status: 404 });
+    res.status(404).json({
+      errormsg: 'Room not found with this ID',
+      status: 404,
+    });
     return;
   }
   await db.disconnect();
@@ -60,15 +59,15 @@ const getSingleRoom = async (
 };
 
 // Update room details => /api/rooms/:id
-const updateRoom = async (
-  req: RoomNextApiRequest,
-  res: NextApiResponse<IRoomDto | IErrormsgStatusDto>,
-): Promise<void> => {
+const updateRoom = async (req: RoomNextApiRequest, res: NextApiResponse<IRoomDto | IErrorDto>): Promise<void> => {
   await db.connect();
   const room = await Room.findById(req.query.id);
   if (!room) {
     await db.disconnect();
-    res.status(404).json({ errormsg: 'Room not found with this ID', status: 404 });
+    res.status(404).json({
+      errormsg: 'Room not found with this ID',
+      status: 404,
+    });
     return;
   }
   const roomToUpdate: IRoomDto = await Room.findByIdAndUpdate(req.query.id, req.body, {
@@ -81,15 +80,15 @@ const updateRoom = async (
 };
 
 // Delete room => /api/rooms/:id
-const deleteRoom = async (
-  req: NextApiRequest,
-  res: NextApiResponse<{ status: number } | IErrormsgStatusDto>,
-): Promise<void> => {
+const deleteRoom = async (req: NextApiRequest, res: NextApiResponse<{ status: number } | IErrorDto>): Promise<void> => {
   await db.connect();
   const room = await Room.findById(req.query.id);
   if (!room) {
     await db.disconnect();
-    res.status(404).json({ errormsg: 'Room not found with this ID', status: 404 });
+    res.status(404).json({
+      errormsg: 'Room not found with this ID',
+      status: 404,
+    });
     return;
   }
   await room.remove();

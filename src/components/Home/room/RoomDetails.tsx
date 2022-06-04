@@ -1,20 +1,23 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import Head from 'next/head';
 import Image from 'next/image';
-import { useSelector, useDispatch } from 'react-redux';
+import { useSelector } from 'react-redux';
 
+import { toast } from 'react-toastify';
 import { Carousel } from 'react-bootstrap';
 
 import { AppState } from '../../../store';
-import useErrormsgStatusDtoAndExceptionError from '../../../hooks/useErrormsgStatusDtoAndExceptionError';
 import { RoomFeatures } from './RoomFeatures';
 
 export function RoomDetails(): JSX.Element {
   const { room, error } = useSelector((state: AppState) => state.roomDetails);
-  const exceptionError = useSelector((state: AppState) => state.exceptionError);
-  const dispatch = useDispatch();
 
-  useErrormsgStatusDtoAndExceptionError(error, exceptionError, dispatch);
+  useEffect((): void => {
+    if (error) {
+      toast.error(error.errormsg);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [error]);
 
   return (
     <>
@@ -58,7 +61,7 @@ export function RoomDetails(): JSX.Element {
             <RoomFeatures room={room} />
           </div>
 
-          <div className="col-12 col-md-6 col-lg-4">
+          <div className="col-12 col-md-6 col-lg-4" style={{ display: room ? 'block' : 'none' }}>
             <div className="booking-card shadow-lg p-4">
               <p className="price-per-night">
                 <b>${room?.pricePerNight}</b> / night

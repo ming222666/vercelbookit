@@ -11,10 +11,12 @@ import { getError } from '../../../utils/getAxiosError';
 // Get room details
 export const getRoom =
   (req: IncomingMessage, roomId: string) =>
-  async (
-    dispatch: ThunkDispatch<RoomDetailsState, undefined, RoomDetailsAction>,
-  ): Promise<RoomDetailsAction | Error> => {
+  async (dispatch: ThunkDispatch<RoomDetailsState, undefined, RoomDetailsAction>): Promise<RoomDetailsAction> => {
     try {
+      dispatch({
+        type: RoomDetailsActionType.ROOM_DETAILS_REQUEST,
+      });
+
       const { origin } = absoluteUrl(req);
 
       const { data } = await axios.get<IRoomDto>(`${origin}/api/rooms/${roomId}`);
@@ -26,22 +28,9 @@ export const getRoom =
     } catch (error) {
       const err = getError(error);
 
-      if (err instanceof Error) {
-        return err;
-      }
-
       return dispatch({
         type: RoomDetailsActionType.ROOM_DETAILS_FAIL,
         payload: err,
       });
     }
-  };
-
-// Clear Errors
-export const clearErrors =
-  () =>
-  async (dispatch: ThunkDispatch<RoomDetailsState, undefined, RoomDetailsAction>): Promise<RoomDetailsAction> => {
-    return dispatch({
-      type: RoomDetailsActionType.CLEAR_ERRORS,
-    });
   };

@@ -1,10 +1,14 @@
 import { BaseAction } from '../../BaseAction';
-import { IRoomDto, IErrormsgStatusDto } from '../../../db/interfaces';
+import { IRoomDto, IErrorDto } from '../../../db/interfaces';
 
 export enum RoomDetailsActionType {
+  ROOM_DETAILS_REQUEST = 'roomDetails/ROOM_DETAILS_REQUEST',
   ROOM_DETAILS_FAIL = 'roomDetails/ROOM_DETAILS_FAIL',
   ROOM_DETAILS_SUCCESS = 'roomDetails/ROOM_DETAILS_SUCCESS',
-  CLEAR_ERRORS = 'roomDetails/CLEAR_ERRORS',
+}
+
+export interface RoomDetailsRequestAction extends BaseAction {
+  type: RoomDetailsActionType.ROOM_DETAILS_REQUEST;
 }
 
 export interface GetRoomDetailsSuccessAction extends BaseAction {
@@ -14,14 +18,7 @@ export interface GetRoomDetailsSuccessAction extends BaseAction {
 
 export interface GetRoomDetailsFailAction extends BaseAction {
   type: RoomDetailsActionType.ROOM_DETAILS_FAIL;
-  payload: IErrormsgStatusDto;
+  payload: IErrorDto;
 }
 
-export interface GetRoomDetailsClearErrorsAction extends BaseAction {
-  type: RoomDetailsActionType.CLEAR_ERRORS;
-}
-
-export type RoomDetailsAction =
-  | GetRoomDetailsSuccessAction
-  | GetRoomDetailsFailAction
-  | GetRoomDetailsClearErrorsAction;
+export type RoomDetailsAction = RoomDetailsRequestAction | GetRoomDetailsSuccessAction | GetRoomDetailsFailAction;

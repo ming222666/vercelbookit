@@ -1,6 +1,8 @@
-export interface IErrormsgStatusDto {
+export interface IErrorDto {
   errormsg: string;
   status: number;
+  internalServerErrorText?: string;
+  exceptionErrorText?: string;
 }
 
 export interface IRoomDummyDto {

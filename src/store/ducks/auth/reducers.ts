@@ -10,15 +10,12 @@ const initialAuthState: AuthState = {
 
 const authReducer = (state: AuthState = initialAuthState, action: AuthAction): AuthState => {
   switch (action.type) {
-    case AuthActionType.LOADING_TRUE:
+    case AuthActionType.AUTH_REQUEST:
       return {
         ...state,
+        error: null,
         loading: true,
-      };
-    case AuthActionType.LOADING_FALSE:
-      return {
-        ...state,
-        loading: false,
+        success: null,
       };
     case AuthActionType.REGISTER_USER_SUCCESS:
       return {
@@ -34,11 +31,6 @@ const authReducer = (state: AuthState = initialAuthState, action: AuthAction): A
         error: action.payload,
         loading: false,
         success: null,
-      };
-    case AuthActionType.CLEAR_ERRORS:
-      return {
-        ...state,
-        error: null,
       };
     default:
       return state;

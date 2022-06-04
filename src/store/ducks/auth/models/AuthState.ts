@@ -1,8 +1,8 @@
-import { IUserDto, IErrormsgStatusDto } from '../../../../db/interfaces';
+import { IUserDto, IErrorDto } from '../../../../db/interfaces';
 
 export type AuthState = {
-  loading: boolean;
   user: IUserDto | null;
-  error: IErrormsgStatusDto | null;
+  loading: boolean;
+  error: IErrorDto | null;
   success: true | null;
 };

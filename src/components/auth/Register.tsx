@@ -6,9 +6,7 @@ import { ThunkDispatch } from 'redux-thunk';
 import { toast } from 'react-toastify';
 
 import ButtonLoader from '../Layout/ButtonLoader';
-import { registerUser, clearError } from '../../store/ducks/auth/action';
-import { clearExceptionError } from '../../store/ducks/exceptionError/action';
-import { ExceptionErrorActionType } from '../../store/ducks/exceptionError/types';
+import { registerUser } from '../../store/ducks/auth/action';
 import { AuthAction } from '../../store/ducks/auth/types';
 import { AuthState } from '../../store/ducks/auth/models/AuthState';
 import { AppState } from '../../store';
@@ -27,7 +25,6 @@ export default function Register(): JSX.Element {
   const [avatarPreview, setAvatarPreview] = useState('/images/default_avatar.jpg');
 
   const { success, error, loading } = useSelector((state: AppState) => state.auth);
-  const exceptionError = useSelector((state: AppState) => state.exceptionError);
 
   useEffect((): void => {
     if (success) {
@@ -36,29 +33,16 @@ export default function Register(): JSX.Element {
 
     if (error) {
       toast.error(error.errormsg);
-      dispatch(clearError());
-    }
-
-    if (exceptionError) {
-      toast.error(exceptionError);
-      dispatch(clearExceptionError());
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [success, error, exceptionError]);
+  }, [success, error]);
 
   const submitHandler = async (e: React.SyntheticEvent<Element, Event>): Promise<void> => {
     e.preventDefault();
 
     const userData = { ...user, avatar };
 
-    const x = await (dispatch as ThunkDispatch<AuthState, undefined, AuthAction>)(registerUser(userData));
-
-    if (x instanceof Error) {
-      dispatch({
-        type: ExceptionErrorActionType.SET_ERROR,
-        payload: x.message,
-      });
-    }
+    await (dispatch as ThunkDispatch<AuthState, undefined, AuthAction>)(registerUser(userData));
   };
 
   const onChange = (e: React.ChangeEvent<HTMLInputElement>): void => {

@@ -3,7 +3,7 @@ import type { /* NextApiRequest */ NextApiResponse } from 'next';
 import { v2 as cloudinary } from 'cloudinary';
 
 import db from '../db/db';
-import { IUserDto, IErrormsgStatusDto } from '../db/interfaces';
+import { IUserDto, IErrorDto } from '../db/interfaces';
 import User from '../db/models/User';
 // import APIFeatures from '../utils/apiFeatures';
 import IWithBodyNextApiRequest from './interfaces/IWithBodyNextApiRequest';
@@ -18,10 +18,7 @@ cloudinary.config({
 type UserNextApiRequest = IWithBodyNextApiRequest<IRegisterUserRequest>;
 
 // Register user => /api/auth/register
-const registerUser = async (
-  req: UserNextApiRequest,
-  res: NextApiResponse<IUserDto | IErrormsgStatusDto>,
-): Promise<void> => {
+const registerUser = async (req: UserNextApiRequest, res: NextApiResponse<IUserDto | IErrorDto>): Promise<void> => {
   if (!req.body.avatar) {
     res.status(400).json({ errormsg: 'Avatar is required', status: 404 });
     return;

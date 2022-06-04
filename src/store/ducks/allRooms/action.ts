@@ -11,8 +11,12 @@ import { getError } from '../../../utils/getAxiosError';
 // Get all rooms
 export const getRooms =
   (req: IncomingMessage, page = '1', location = '', guests: string, category: string) =>
-  async (dispatch: ThunkDispatch<AllRoomsState, undefined, AllRoomsAction>): Promise<AllRoomsAction | Error> => {
+  async (dispatch: ThunkDispatch<AllRoomsState, undefined, AllRoomsAction>): Promise<AllRoomsAction> => {
     try {
+      dispatch({
+        type: AllRoomsActionType.ALL_ROOMS_REQUEST,
+      });
+
       const { origin } = absoluteUrl(req);
 
       let link = `${origin}/api/rooms?page=${page}&location=${location}`;
@@ -29,22 +33,9 @@ export const getRooms =
     } catch (error) {
       const err = getError(error);
 
-      if (err instanceof Error) {
-        return err;
-      }
-
       return dispatch({
         type: AllRoomsActionType.ALL_ROOMS_FAIL,
         payload: err,
       });
     }
-  };
-
-// Clear Errors
-export const clearErrors =
-  () =>
-  async (dispatch: ThunkDispatch<AllRoomsState, undefined, AllRoomsAction>): Promise<AllRoomsAction> => {
-    return dispatch({
-      type: AllRoomsActionType.CLEAR_ERRORS,
-    });
   };

@@ -6,15 +6,14 @@ import { AuthState } from './models/AuthState';
 import { IUserDto } from '../../../db/interfaces';
 import { getError } from '../../../utils/getAxiosError';
 import IRegisterUserRequest from '../../../controllers/interfaces/IRegisterUserRequest';
-// import { ExceptionErrorActionType } from '../../../store/ducks/exceptionError/types';
 
 // Register user
 export const registerUser =
   (userData: IRegisterUserRequest) =>
-  async (dispatch: ThunkDispatch<AuthState, undefined, AuthAction>): Promise<AuthAction | Error> => {
+  async (dispatch: ThunkDispatch<AuthState, undefined, AuthAction>): Promise<AuthAction> => {
     try {
       dispatch({
-        type: AuthActionType.LOADING_TRUE,
+        type: AuthActionType.AUTH_REQUEST,
       });
 
       const config = {
@@ -32,19 +31,9 @@ export const registerUser =
     } catch (error) {
       const err = getError(error);
 
-      if (err instanceof Error) {
-        dispatch({
-          type: AuthActionType.LOADING_FALSE,
-        });
-        return err;
-      }
-
       return dispatch({
         type: AuthActionType.REGISTER_USER_FAIL,
         payload: err,
       });
     }
   };
-
-// Clear Errors
-export const clearError = (): AuthAction => ({ type: AuthActionType.CLEAR_ERRORS });

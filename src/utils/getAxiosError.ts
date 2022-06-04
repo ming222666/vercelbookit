@@ -1,23 +1,27 @@
 import axios, { AxiosError } from 'axios';
 
-import { IErrormsgStatusDto } from '../db/interfaces';
+import { IErrorDto } from '../db/interfaces';
 
-export function getError(err: unknown): IErrormsgStatusDto | Error {
+export function getError(err: unknown): IErrorDto {
   if (axios.isAxiosError(err)) {
     const axErr: AxiosError = err;
     if (axErr.response?.data && axErr.response?.data.errormsg) {
       const status: number = axErr.response.data.status;
       if (status >= 500) {
-        // errormsg is server generated, potentially technical revealing...
+        // errormsg above is server generated, potentially technical revealing...
         return {
           errormsg: 'Internal Server Error',
-          status: 500,
+          status,
+          internalServerErrorText: axErr.response?.data.errormsg,
+          exceptionErrorText: '',
         };
       }
       // (401/404) User not found. (400) Validation error e.g. Age mustn't exceed 99 ...
       return {
         errormsg: axErr.response.data.errormsg,
         status,
+        internalServerErrorText: '',
+        exceptionErrorText: '',
       };
     }
   }
@@ -30,32 +34,42 @@ export function getError(err: unknown): IErrormsgStatusDto | Error {
   if (posOfStatusCode !== -1) {
     if (error.indexOf('404') !== -1) {
       return {
-        errormsg: 'Invalid url',
+        errormsg: 'Invalid resource url',
         status: 404,
+        internalServerErrorText: '',
+        exceptionErrorText: '',
       };
     }
     if (error.indexOf('401') !== -1) {
       return {
         errormsg: 'Unauthorized access not permitted',
         status: 401,
+        internalServerErrorText: '',
+        exceptionErrorText: '',
       };
     }
     if (error.indexOf('400') !== -1) {
       return {
         errormsg: 'Bad request',
         status: 400,
+        internalServerErrorText: '',
+        exceptionErrorText: '',
       };
     }
     if (error.indexOf('500') !== -1) {
       return {
         errormsg: 'Internal Server Error',
         status: 500,
+        internalServerErrorText: 'Internal Server Error',
+        exceptionErrorText: '',
       };
     }
     if (error.indexOf('501') !== -1) {
       return {
         errormsg: 'Internal Server Error',
         status: 501,
+        internalServerErrorText: 'Internal Server Error',
+        exceptionErrorText: '',
       };
     }
 
@@ -68,11 +82,19 @@ export function getError(err: unknown): IErrormsgStatusDto | Error {
     return {
       errormsg: error,
       status: statusCode,
+      internalServerErrorText: '',
+      exceptionErrorText: '',
     };
   }
 
   // eslint-disable-next-line no-console
   console.log('err', err);
   // due to e.g. await axios.TYPOget() instead of await axios.get()
-  return new Error('Exception error');
+  return {
+    errormsg: 'Exception error',
+    status: 999,
+    internalServerErrorText: '',
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    exceptionErrorText: (err as any).message,
+  };
 }
