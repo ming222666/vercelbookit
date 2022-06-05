@@ -47,7 +47,6 @@ export default NextAuth({
         }
 
         // Check if password is correct or not
-        // const isPasswordMatched = await user.comparePassword(password);
         const isPasswordMatched = await comparePassword(password, user.password);
 
         if (!isPasswordMatched) {
