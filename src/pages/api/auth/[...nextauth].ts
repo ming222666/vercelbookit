@@ -3,8 +3,12 @@ import CredentialsProvider from 'next-auth/providers/credentials';
 
 import db from '../../../db/db';
 import User from '../../../db/models/User';
+import comparePassword from '../../../utils/comparePassword';
 
 export default NextAuth({
+  session: {
+    strategy: 'jwt',
+  },
   providers: [
     CredentialsProvider({
       // The name to display on the sign in form (e.g. 'Sign in with...')
@@ -38,15 +42,24 @@ export default NextAuth({
         const user = await User.findOne({ email }).select('+password');
 
         if (!user) {
+          await db.disconnect();
           throw new Error('Invalid Email or Password');
         }
 
         // Check if password is correct or not
-        const isPasswordMatched = await user.comparePassword(password);
+        // const isPasswordMatched = await user.comparePassword(password);
+        const isPasswordMatched = await comparePassword(password, user.password);
 
         if (!isPasswordMatched) {
+          await db.disconnect();
           throw new Error('Invalid Email or Password');
         }
+
+        await db.disconnect();
+
+        user._id = user._id.toString();
+
+        user['password'] = null;
 
         return user;
       },
@@ -55,11 +68,14 @@ export default NextAuth({
   callbacks: {
     async jwt({ token, user }) {
       user && (token.user = user);
-      return token;
+
+      return Promise.resolve(token);
     },
-    async session({ session, user }) {
-      session.user = user;
-      return session;
+    async session({ session, token }) {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      (session as any).user = token.user;
+
+      return Promise.resolve(session);
     },
   },
 });
