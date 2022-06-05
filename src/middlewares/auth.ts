@@ -11,6 +11,6 @@ export const isAuth = async (req: NextApiRequest, res: NextApiResponse, next: an
     (req as any).user = session.user;
     next();
   } else {
-    res.status(status).send({ errormsg: 'Session not found', status });
+    res.status(status).send({ errormsg: 'Login first to access this resource', status });
   }
 };
