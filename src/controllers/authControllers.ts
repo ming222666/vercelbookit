@@ -7,7 +7,7 @@ import { IUserDto, IErrorDto } from '../db/interfaces';
 import User from '../db/models/User';
 // import APIFeatures from '../utils/apiFeatures';
 import IWithBodyNextApiRequest from './interfaces/IWithBodyNextApiRequest';
-import IRegisterUserRequest from './interfaces/IRegisterUserRequest';
+import IRegisterUserFormData from './interfaces/IRegisterUserFormData';
 
 cloudinary.config({
   cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
@@ -15,10 +15,13 @@ cloudinary.config({
   api_secret: process.env.CLOUDINARY_API_SECRET,
 });
 
-type UserNextApiRequest = IWithBodyNextApiRequest<IRegisterUserRequest>;
+type UserNextApiRequest = IWithBodyNextApiRequest<IRegisterUserFormData>;
 
 // Register user => /api/auth/register
-const registerUser = async (req: UserNextApiRequest, res: NextApiResponse<IUserDto | IErrorDto>): Promise<void> => {
+const registerUser = async (
+  req: UserNextApiRequest,
+  res: NextApiResponse<{ status: number } | IErrorDto>,
+): Promise<void> => {
   if (!req.body.avatar) {
     res.status(400).json({ errormsg: 'Avatar is required', status: 404 });
     return;
@@ -34,7 +37,7 @@ const registerUser = async (req: UserNextApiRequest, res: NextApiResponse<IUserD
 
   const { name, email, password } = req.body;
 
-  const user: IUserDto = await User.create({
+  await User.create({
     name,
     email,
     password,
@@ -46,15 +49,7 @@ const registerUser = async (req: UserNextApiRequest, res: NextApiResponse<IUserD
 
   await db.disconnect();
   res.status(201).send({
-    _id: user._id,
-    name: user.name,
-    email: user.email,
-    avatar: user.avatar,
-    role: user.role,
-    createdAt: user.createdAt,
-    updatedAt: user.updatedAt,
-    resetPasswordToken: user.resetPasswordToken,
-    resetPasswordExpire: user.resetPasswordExpire,
+    status: 201,
   });
 };
 

@@ -1,20 +1,15 @@
-import React, { useState, useEffect } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
-import { useRouter } from 'next/router';
-import { ThunkDispatch } from 'redux-thunk';
+import React, { useState } from 'react';
+import { signIn, SignInResponse } from 'next-auth/react';
 
+import axios from 'axios';
 import { toast } from 'react-toastify';
 
 import ButtonLoader from '../Layout/ButtonLoader';
-import { registerUser } from '../../store/ducks/auth/action';
-import { AuthAction } from '../../store/ducks/auth/types';
-import { AuthState } from '../../store/ducks/auth/models/AuthState';
-import { AppState } from '../../store';
+import IRegisterUserFormData from '../../controllers/interfaces/IRegisterUserFormData';
+import { IErrorDto } from '../../db/interfaces';
+import { getError } from '../../utils/getAxiosError';
 
 export default function Register(): JSX.Element {
-  const dispatch = useDispatch();
-  const router = useRouter();
-
   const [user, setUser] = useState<{ name: string; email: string; password: string }>({
     name: '',
     email: '',
@@ -24,25 +19,67 @@ export default function Register(): JSX.Element {
   const [avatar, setAvatar] = useState('');
   const [avatarPreview, setAvatarPreview] = useState('/images/default_avatar.jpg');
 
-  const { success, error, loading } = useSelector((state: AppState) => state.auth);
+  const [loading, setLoading] = useState(false);
 
-  useEffect((): void => {
-    if (success) {
-      router.push('/login');
+  const signInUser = async (
+    email: string,
+    password: string,
+    redirect = false,
+  ): Promise<SignInResponse | undefined | Error> => {
+    try {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const result = await signIn<any>('credentials', {
+        redirect,
+        email: email,
+        password: password,
+      });
+      return result;
+    } catch (error) {
+      // eslint-disable-next-line no-console
+      console.log('error', error);
+      return new Error((error as Error).message);
     }
+  };
 
-    if (error) {
-      toast.error(error.errormsg);
+  const registerUser = async (userData: IRegisterUserFormData): Promise<void> => {
+    try {
+      setLoading(true);
+
+      const config = {
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      };
+
+      await axios.post<{ status: number } | IErrorDto>('/api/auth/register', userData, config);
+
+      const result = await signInUser(userData.email, userData.password);
+
+      if (result instanceof Error) {
+        setLoading(false);
+        toast.error(result.message);
+        return;
+      } else if (result && result.error) {
+        setLoading(false);
+        toast.error(result.error);
+        return;
+      }
+      toast.success('You are successfully registered', {
+        onClose: (): void => {
+          window.location.href = '/';
+        },
+      });
+    } catch (error) {
+      setLoading(false);
+      const err = getError(error);
+      toast.error(err.errormsg);
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [success, error]);
+  };
 
   const submitHandler = async (e: React.SyntheticEvent<Element, Event>): Promise<void> => {
     e.preventDefault();
-
     const userData = { ...user, avatar };
-
-    await (dispatch as ThunkDispatch<AuthState, undefined, AuthAction>)(registerUser(userData));
+    await registerUser(userData);
   };
 
   const onChange = (e: React.ChangeEvent<HTMLInputElement>): void => {

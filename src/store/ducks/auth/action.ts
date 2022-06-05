@@ -5,11 +5,11 @@ import { AuthAction, AuthActionType } from './types';
 import { AuthState } from './models/AuthState';
 import { IUserDto } from '../../../db/interfaces';
 import { getError } from '../../../utils/getAxiosError';
-import IRegisterUserRequest from '../../../controllers/interfaces/IRegisterUserRequest';
+import IRegisterUserFormData from '../../../controllers/interfaces/IRegisterUserFormData';
 
 // Register user
 export const registerUser =
-  (userData: IRegisterUserRequest) =>
+  (userData: IRegisterUserFormData) =>
   async (dispatch: ThunkDispatch<AuthState, undefined, AuthAction>): Promise<AuthAction> => {
     try {
       dispatch({
