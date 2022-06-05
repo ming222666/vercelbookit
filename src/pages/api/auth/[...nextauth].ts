@@ -39,7 +39,7 @@ export default NextAuth({
         await db.connect();
 
         // Find user in the database
-        const user = await User.findOne({ email }).select('+password');
+        const user = await User.findOne({ email }).select('+password').lean();
 
         if (!user) {
           await db.disconnect();
