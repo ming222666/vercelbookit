@@ -7,7 +7,7 @@ import User from '../db/models/User';
 // Get current user profile => /api/user/profile
 const getUserProfile = async (req: NextApiRequest, res: NextApiResponse<IUserDto | IErrorDto>): Promise<void> => {
   await db.connect();
-  console.log('getUserProfile');
+
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const user: IUserDto = await User.findById((req as any).user._id).lean();
   if (!user) {

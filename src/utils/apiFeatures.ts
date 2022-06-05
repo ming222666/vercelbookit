@@ -23,9 +23,6 @@ export default class APIFeatures {
         }
       : {};
 
-    // eslint-disable-next-line no-console
-    console.log(location);
-
     this.query = this.query.find({ ...location });
     return this;
   }
@@ -37,9 +34,6 @@ export default class APIFeatures {
     const removeFields = ['location', 'page'];
 
     removeFields.forEach((el) => delete queryStrCopy[el]);
-
-    // eslint-disable-next-line no-console
-    console.log(queryStrCopy);
 
     this.query = this.query.find({ ...queryStrCopy });
     return this;

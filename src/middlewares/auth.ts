@@ -5,9 +5,6 @@ import { getSession } from 'next-auth/react';
 export const isAuth = async (req: NextApiRequest, res: NextApiResponse, next: any): Promise<void> => {
   const session = await getSession({ req });
 
-  // eslint-disable-next-line no-console
-  console.log('auth.ts session', session);
-
   const status = 401;
   if (session) {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
