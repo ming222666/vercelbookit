@@ -13,7 +13,7 @@ export const registerUser =
   async (dispatch: ThunkDispatch<AuthState, undefined, AuthAction>): Promise<AuthAction> => {
     try {
       dispatch({
-        type: AuthActionType.AUTH_REQUEST,
+        type: AuthActionType.LOAD_USER_REQUEST,
       });
 
       const config = {
@@ -25,14 +25,14 @@ export const registerUser =
       const { data } = await axios.post<IUserDto>('/api/auth/register', userData, config);
 
       return dispatch({
-        type: AuthActionType.REGISTER_USER_SUCCESS,
+        type: AuthActionType.LOAD_USER_SUCCESS,
         payload: data,
       });
     } catch (error) {
       const err = getError(error);
 
       return dispatch({
-        type: AuthActionType.REGISTER_USER_FAIL,
+        type: AuthActionType.LOAD_USER_FAIL,
         payload: err,
       });
     }
