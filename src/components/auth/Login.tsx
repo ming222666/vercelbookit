@@ -23,9 +23,8 @@ export default function Login(): JSX.Element {
       password,
     });
 
-    setLoading(false);
-
     if (result && result.error) {
+      setLoading(false);
       toast.error(result.error);
     } else {
       window.location.href = '/';

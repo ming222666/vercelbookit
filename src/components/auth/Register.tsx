@@ -64,7 +64,7 @@ export default function Register(): JSX.Element {
         toast.error(result.error);
         return;
       }
-      toast.success('You are successfully registered', {
+      toast.success('Successfully registered!', {
         onClose: (): void => {
           window.location.href = '/';
         },

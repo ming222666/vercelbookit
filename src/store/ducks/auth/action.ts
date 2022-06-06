@@ -7,6 +7,12 @@ import { IUserDto } from '../../../db/interfaces';
 import { getError } from '../../../utils/getAxiosError';
 import IRegisterUserFormData from '../../../controllers/interfaces/IRegisterUserFormData';
 
+const config = {
+  headers: {
+    'Content-Type': 'application/json',
+  },
+};
+
 // Register user
 export const registerUser =
   (userData: IRegisterUserFormData) =>
@@ -15,12 +21,6 @@ export const registerUser =
       dispatch({
         type: AuthActionType.LOAD_USER_REQUEST,
       });
-
-      const config = {
-        headers: {
-          'Content-Type': 'application/json',
-        },
-      };
 
       const { data } = await axios.post<IUserDto>('/api/auth/register', userData, config);
 
@@ -35,5 +35,54 @@ export const registerUser =
         type: AuthActionType.LOAD_USER_FAIL,
         payload: err,
       });
+    }
+  };
+
+// Get current user
+export const loadUser =
+  () /* : ThunkAction<Promise<AuthAction>, AuthState, undefined, AuthAction> */ =>
+  async (dispatch: ThunkDispatch<AuthState, undefined, AuthAction>): Promise<AuthAction> => {
+    try {
+      dispatch({
+        type: AuthActionType.LOAD_USER_REQUEST,
+      });
+
+      // withCredentials: true will send cookies automatically e.g. session cookie
+      const { data } = await axios.get<IUserDto>('/api/auth/profile', { withCredentials: true });
+
+      return dispatch({
+        type: AuthActionType.LOAD_USER_SUCCESS,
+        payload: data,
+      });
+    } catch (error) {
+      const err = getError(error);
+
+      /**
+       * Turns out that sometimes an extra /api/auth/profile call is needed
+       * even if user is already logined i.e. session already exists.
+       * Could be a nextjs issue.
+       */
+      if (err.status === 401) {
+        try {
+          const { data } = await axios.get<IUserDto>('/api/auth/profile', { withCredentials: true });
+
+          return dispatch({
+            type: AuthActionType.LOAD_USER_SUCCESS,
+            payload: data,
+          });
+        } catch (error2) {
+          const err = getError(error2);
+
+          return dispatch({
+            type: AuthActionType.LOAD_USER_FAIL,
+            payload: err,
+          });
+        }
+      } else {
+        return dispatch({
+          type: AuthActionType.LOAD_USER_FAIL,
+          payload: err,
+        });
+      }
     }
   };
