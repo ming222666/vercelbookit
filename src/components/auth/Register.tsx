@@ -5,7 +5,7 @@ import axios from 'axios';
 import { toast } from 'react-toastify';
 
 import ButtonLoader from '../Layout/ButtonLoader';
-import IRegisterUserFormData from '../../controllers/interfaces/IRegisterUserFormData';
+import IUserFormData from '../../controllers/interfaces/IUserFormData';
 import { IErrorDto } from '../../db/interfaces';
 import { getError } from '../../utils/getAxiosError';
 
@@ -41,7 +41,7 @@ export default function Register(): JSX.Element {
     }
   };
 
-  const registerUser = async (userData: IRegisterUserFormData): Promise<void> => {
+  const registerUser = async (userData: IUserFormData): Promise<void> => {
     try {
       setLoading(true);
 

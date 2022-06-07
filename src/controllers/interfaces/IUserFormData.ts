@@ -1,4 +1,4 @@
-export default interface IRegisterUserFormData {
+export default interface IUserFormData {
   name: string;
   email: string;
   password: string;

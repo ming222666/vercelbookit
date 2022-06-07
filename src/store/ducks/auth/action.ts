@@ -5,7 +5,7 @@ import { AuthAction, AuthActionType } from './types';
 import { AuthState } from './models/AuthState';
 import { IUserDto } from '../../../db/interfaces';
 import { getError } from '../../../utils/getAxiosError';
-import IRegisterUserFormData from '../../../controllers/interfaces/IRegisterUserFormData';
+import IUserFormData from '../../../controllers/interfaces/IUserFormData';
 
 const config = {
   headers: {
@@ -15,7 +15,7 @@ const config = {
 
 // Register user
 export const registerUser =
-  (userData: IRegisterUserFormData) =>
+  (userData: IUserFormData) =>
   async (dispatch: ThunkDispatch<AuthState, undefined, AuthAction>): Promise<AuthAction> => {
     try {
       dispatch({
@@ -48,7 +48,7 @@ export const loadUser =
       });
 
       // withCredentials: true will send cookies automatically e.g. session cookie
-      const { data } = await axios.get<IUserDto>('/api/auth/profile', { withCredentials: true });
+      const { data } = await axios.get<IUserDto>('/api/me/profile', { withCredentials: true });
 
       return dispatch({
         type: AuthActionType.LOAD_USER_SUCCESS,
