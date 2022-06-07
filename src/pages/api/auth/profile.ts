@@ -2,12 +2,12 @@ import nc from 'next-connect';
 
 import { onError, onNoMatch } from '../../../utils/onError';
 import { isAuth } from '../../../middlewares/auth';
-import { getUserProfile } from '../../../controllers/authControllers';
+import { currentUserProfile } from '../../../controllers/authControllers';
 
 const handler = nc({ onError, onNoMatch });
 
 handler.use(isAuth);
 
-handler.get(getUserProfile);
+handler.get(currentUserProfile);
 
 export default handler;

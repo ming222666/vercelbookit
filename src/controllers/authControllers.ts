@@ -54,7 +54,7 @@ const registerUser = async (
 };
 
 // Get current user profile => /api/auth/profile
-const getUserProfile = async (req: NextApiRequest, res: NextApiResponse<IUserDto | IErrorDto>): Promise<void> => {
+const currentUserProfile = async (req: NextApiRequest, res: NextApiResponse<IUserDto | IErrorDto>): Promise<void> => {
   await db.connect();
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -81,4 +81,4 @@ const getUserProfile = async (req: NextApiRequest, res: NextApiResponse<IUserDto
   });
 };
 
-export { registerUser, getUserProfile };
+export { registerUser, currentUserProfile };
