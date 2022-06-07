@@ -20,26 +20,10 @@ export const getServerSideProps: GetServerSideProps<Props> = async (context) => 
   const session = await getSession({ req: context.req });
 
   if (!session) {
-    /**
-     * Turns out that sometimes a re-try is needed
-     * even if user is already logined i.e. session already exists.
-     * Could be a nextjs bug.
-     */
-    // re-try
-    const session2 = await getSession({ req: context.req });
-
-    if (!session2) {
-      return {
-        redirect: {
-          destination: '/login',
-          permanent: false,
-        },
-      };
-    }
-
     return {
-      props: {
-        session: session2,
+      redirect: {
+        destination: '/login',
+        permanent: false,
       },
     };
   }

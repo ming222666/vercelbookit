@@ -57,32 +57,9 @@ export const loadUser =
     } catch (error) {
       const err = getError(error);
 
-      /**
-       * Turns out that sometimes an extra /api/auth/profile call is needed
-       * even if user is already logined i.e. session already exists.
-       * Could be a nextjs bug.
-       */
-      if (err.status === 401) {
-        try {
-          const { data } = await axios.get<IUserDto>('/api/auth/profile', { withCredentials: true });
-
-          return dispatch({
-            type: AuthActionType.LOAD_USER_SUCCESS,
-            payload: data,
-          });
-        } catch (error2) {
-          const err = getError(error2);
-
-          return dispatch({
-            type: AuthActionType.LOAD_USER_FAIL,
-            payload: err,
-          });
-        }
-      } else {
-        return dispatch({
-          type: AuthActionType.LOAD_USER_FAIL,
-          payload: err,
-        });
-      }
+      return dispatch({
+        type: AuthActionType.LOAD_USER_FAIL,
+        payload: err,
+      });
     }
   };
