@@ -60,7 +60,7 @@ export const loadUser =
       /**
        * Turns out that sometimes an extra /api/auth/profile call is needed
        * even if user is already logined i.e. session already exists.
-       * Could be a nextjs issue.
+       * Could be a nextjs bug.
        */
       if (err.status === 401) {
         try {
