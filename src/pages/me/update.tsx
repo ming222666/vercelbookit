@@ -1,22 +1,19 @@
 import React from 'react';
 import type { NextPage, GetServerSideProps } from 'next';
 import { getSession } from 'next-auth/react';
-import { Session } from 'next-auth';
 
-interface Props {
-  session: Session;
-}
+import Layout from '../../components/Layout';
+import Update from '../../components/me/Update';
 
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-const UpdateProfilePage: NextPage<Props> = ({ session }: Props) => {
+const UpdateProfilePage: NextPage = () => {
   return (
-    <div>
-      <h1>User Profile</h1>
-    </div>
+    <Layout title="Update Profile">
+      <Update />
+    </Layout>
   );
 };
 
-export const getServerSideProps: GetServerSideProps<Props> = async (context) => {
+export const getServerSideProps: GetServerSideProps = async (context) => {
   const session = await getSession({ req: context.req });
 
   if (!session) {
@@ -29,9 +26,7 @@ export const getServerSideProps: GetServerSideProps<Props> = async (context) => 
   }
 
   return {
-    props: {
-      session,
-    },
+    props: {},
   };
 };
 

@@ -13,8 +13,7 @@ const LoginPage: NextPage = () => {
   );
 };
 
-// eslint-disable-next-line @typescript-eslint/ban-types
-export const getServerSideProps: GetServerSideProps<{}> = async (context) => {
+export const getServerSideProps: GetServerSideProps = async (context) => {
   const session = await getSession({ req: context.req });
 
   if (session) {
