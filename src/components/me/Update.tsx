@@ -1,53 +1,36 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { useSelector } from 'react-redux';
+import { useSelector, useDispatch } from 'react-redux';
 
-// import axios from 'axios';
+import axios from 'axios';
 import { toast } from 'react-toastify';
 
 import ButtonLoader from '../Layout/ButtonLoader';
-// import IUserFormData from '../../controllers/interfaces/IUserFormData';
-// import { IErrorDto } from '../../db/interfaces';
-// import { getError } from '../../utils/getAxiosError';
+import IUserFormData from '../../controllers/interfaces/IUserFormData';
+import { IErrorDto } from '../../db/interfaces';
+import { getError } from '../../utils/getAxiosError';
 import { AppState } from '../../store';
+import { AuthDispatch } from '../../components/Layout/Header';
+import { loadUser } from '../../store/ducks/auth/action';
 
 export default function UpdateProfile(): JSX.Element {
   const { user: userFromState, error, success, loading } = useSelector((state: AppState) => state.auth);
 
-  const [user, setUser] = useState<{ name: string | undefined; email: string | undefined; password: string }>({
-    name: userFromState?.name,
-    email: userFromState?.email,
+  const [user, setUser] = useState<{ name: string; email: string; password: string }>({
+    name: userFromState ? userFromState.name : '',
+    email: userFromState ? userFromState.email : '',
     password: '',
   });
 
-  // const [avatar, setAvatar] = useState('');
-  const [avatarPreview, setAvatarPreview] = useState<string | undefined>(
+  const [avatar, setAvatar] = useState('');
+  const [avatarPreview, setAvatarPreview] = useState<string>(
     userFromState?.avatar && userFromState?.avatar.public_id
       ? userFromState.avatar.public_id
       : '/images/default_avatar.jpg',
   );
 
-  const isSubmittedUpdate = useRef(false);
+  const dispatch: AuthDispatch = useDispatch();
 
-  // useEffect(() => {
-  //   if (success) {
-  //     if (userFromState) {
-  //       // reflect user state into the form
-  //       setUser({
-  //         name: userFromState.name,
-  //         email: userFromState.email,
-  //         password: '',
-  //       });
-  //       userFromState.avatar?.public_id && setAvatarPreview(userFromState.avatar.public_id);
-  //     }
-  //   }
-  //
-  //   if (isSubmittedUpdate.current) {
-  //     isSubmittedUpdate.current = false;
-  //     if (success) toast.success('Profile successfully updated');
-  //     if (error) toast.error(`Update Error: ${error.errormsg}`);
-  //   }
-  //   // eslint-disable-next-line react-hooks/exhaustive-deps
-  // }, [success, error]);
+  const isSubmittedUpdate = useRef(false);
 
   useEffect(() => {
     if (userFromState) {
@@ -68,7 +51,7 @@ export default function UpdateProfile(): JSX.Element {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [userFromState]);
 
-  /*   const updateUser = async (userData: IUserFormData): Promise<void> => {
+  const updateUser = async (userData: IUserFormData): Promise<void> => {
     try {
       const config = {
         headers: {
@@ -76,31 +59,19 @@ export default function UpdateProfile(): JSX.Element {
         },
       };
 
-      await axios.post<{ status: number } | IErrorDto>('/api/auth/register', userData, config);
-
-      if (result instanceof Error) {
-        toast.error(result.message);
-        return;
-      } else if (result && result.error) {
-        toast.error(result.error);
-        return;
-      }
-      toast.success('Successfully registered!', {
-        onClose: (): void => {
-          window.location.href = '/';
-        },
-      });
+      await axios.post<{ status: number } | IErrorDto>('/api/me/update', userData, config);
+      await dispatch(loadUser());
     } catch (error) {
       const err = getError(error);
       toast.error(err.errormsg);
     }
-  }; */
+  };
 
   const submitHandler = async (e: React.SyntheticEvent<Element, Event>): Promise<void> => {
     e.preventDefault();
     isSubmittedUpdate.current = true;
-    // const userData = { ...user, avatar };
-    // await updateUser(userData);
+    const userData = { ...user, avatar };
+    await updateUser(userData);
   };
 
   const onChange = (e: React.ChangeEvent<HTMLInputElement>): void => {
@@ -109,7 +80,7 @@ export default function UpdateProfile(): JSX.Element {
 
       reader.onload = (): void => {
         if (reader.readyState === 2) {
-          // setAvatar(reader.result as string);
+          setAvatar(reader.result as string);
           setAvatarPreview(reader.result as string);
         }
       };

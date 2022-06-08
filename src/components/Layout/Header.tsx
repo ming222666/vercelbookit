@@ -11,7 +11,7 @@ import { AppState } from '../../store';
 import { AuthState } from '../../store/ducks/auth/models/AuthState';
 import { loadUser } from '../../store/ducks/auth/action';
 
-type AuthDispatch = ThunkDispatch<AuthState, undefined, AnyAction>;
+export type AuthDispatch = ThunkDispatch<AuthState, undefined, AnyAction>;
 
 export function Header(): JSX.Element {
   // https://stackoverflow.com/questions/59800913/type-safe-usedispatch-with-redux-thunk
@@ -88,11 +88,13 @@ export function Header(): JSX.Element {
               </div>
             </div>
           ) : (
-            <Link href={loading ? '#' : '/login'}>
-              <a className={`btn btn-danger px-4 text-white login-header-btn float-right${loading ? ' disabled' : ''}`}>
-                Login
-              </a>
-            </Link>
+            <>
+              {loading ? null : (
+                <Link href="/login">
+                  <a className="btn btn-danger px-4 text-white login-header-btn float-right">Login</a>
+                </Link>
+              )}
+            </>
           )}
         </div>
       </div>
