@@ -1,21 +1,17 @@
 import React, { useEffect } from 'react';
-import { useSelector, useDispatch } from 'react-redux';
-import { AnyAction } from 'redux';
-import { ThunkDispatch } from 'redux-thunk';
+import { useSelector } from 'react-redux';
 import Link from 'next/Link';
 import { signOut } from 'next-auth/react';
 
 import { toast } from 'react-toastify';
 
+import useAppDispatch from '../../hooks/useAppDispatch';
 import { AppState } from '../../store';
-import { AuthState } from '../../store/ducks/auth/models/AuthState';
 import { loadUser } from '../../store/ducks/auth/action';
-
-export type AuthDispatch = ThunkDispatch<AuthState, undefined, AnyAction>;
 
 export function Header(): JSX.Element {
   // https://stackoverflow.com/questions/59800913/type-safe-usedispatch-with-redux-thunk
-  const dispatch: AuthDispatch = useDispatch();
+  const dispatch = useAppDispatch();
   const { user, error, loading } = useSelector((state: AppState) => state.auth);
 
   useEffect((): void => {

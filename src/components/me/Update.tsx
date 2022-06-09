@@ -1,11 +1,11 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { useSelector, useDispatch } from 'react-redux';
+import { useSelector } from 'react-redux';
 
 import { toast } from 'react-toastify';
 
 import ButtonLoader from '../Layout/ButtonLoader';
+import useAppDispatch from '../../hooks/useAppDispatch';
 import { AppState } from '../../store';
-import { AuthDispatch } from '../../components/Layout/Header';
 import { updateUser } from '../../store/ducks/auth/action';
 
 export default function UpdateProfile(): JSX.Element {
@@ -22,7 +22,7 @@ export default function UpdateProfile(): JSX.Element {
     userFromState?.avatar && userFromState?.avatar.url ? userFromState.avatar.url : '/images/default_avatar.jpg',
   );
 
-  const dispatch: AuthDispatch = useDispatch();
+  const dispatch = useAppDispatch();
 
   const isSubmittedUpdate = useRef(false);
 

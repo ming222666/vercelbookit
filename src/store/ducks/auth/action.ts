@@ -2,7 +2,6 @@ import { ThunkDispatch } from 'redux-thunk';
 import axios from 'axios';
 
 import { AuthAction, AuthActionType } from './types';
-import { AuthState } from './models/AuthState';
 import { IUserDto } from '../../../db/interfaces';
 import { getError } from '../../../utils/getAxiosError';
 import IUserFormData from '../../../controllers/interfaces/IUserFormData';
@@ -14,7 +13,7 @@ const config = {
 };
 
 // * Commented below registerUser action as it is not being used anywhere,
-// * in particular regarding Register component.
+// * in particular with regard to Register component.
 // Register user
 /* export const registerUser =
   (userData: IUserFormData) =>
@@ -43,7 +42,7 @@ const config = {
 // Get current user
 export const loadUser =
   () /* : ThunkAction<Promise<AuthAction>, AuthState, undefined, AuthAction> */ =>
-  async (dispatch: ThunkDispatch<AuthState, undefined, AuthAction>): Promise<AuthAction> => {
+  async (dispatch: ThunkDispatch<undefined, undefined, AuthAction>): Promise<AuthAction> => {
     try {
       dispatch({
         type: AuthActionType.LOAD_USER_REQUEST,
@@ -68,7 +67,7 @@ export const loadUser =
 // Update user
 export const updateUser =
   (userData: IUserFormData) =>
-  async (dispatch: ThunkDispatch<AuthState, undefined, AuthAction>): Promise<AuthAction> => {
+  async (dispatch: ThunkDispatch<undefined, undefined, AuthAction>): Promise<AuthAction> => {
     try {
       dispatch({
         type: AuthActionType.LOAD_USER_REQUEST,
