@@ -28,10 +28,12 @@ const initialStore = () =>
   createStore(
     reducer,
     initialState,
-    process.env.NODE_ENV !== 'production'
-      ? // eslint-disable-next-line @typescript-eslint/no-var-requires
-        require('redux-devtools-extension').composeWithDevTools(applyMiddleware(...middleware))
-      : applyMiddleware(...middleware),
+    // eslint-disable-next-line @typescript-eslint/no-var-requires
+    require('redux-devtools-extension').composeWithDevTools(applyMiddleware(...middleware)),
+    // process.env.NODE_ENV !== 'production'
+    //   ? // eslint-disable-next-line @typescript-eslint/no-var-requires
+    //     require('redux-devtools-extension').composeWithDevTools(applyMiddleware(...middleware))
+    //   : applyMiddleware(...middleware),
   );
 
 export const wrapper = createWrapper(initialStore);

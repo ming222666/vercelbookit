@@ -1,16 +1,12 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 
-import axios from 'axios';
 import { toast } from 'react-toastify';
 
 import ButtonLoader from '../Layout/ButtonLoader';
-import IUserFormData from '../../controllers/interfaces/IUserFormData';
-import { IErrorDto } from '../../db/interfaces';
-import { getError } from '../../utils/getAxiosError';
 import { AppState } from '../../store';
 import { AuthDispatch } from '../../components/Layout/Header';
-import { loadUser } from '../../store/ducks/auth/action';
+import { updateUser } from '../../store/ducks/auth/action';
 
 export default function UpdateProfile(): JSX.Element {
   const { user: userFromState, error, success, loading } = useSelector((state: AppState) => state.auth);
@@ -23,9 +19,7 @@ export default function UpdateProfile(): JSX.Element {
 
   const [avatar, setAvatar] = useState('');
   const [avatarPreview, setAvatarPreview] = useState<string>(
-    userFromState?.avatar && userFromState?.avatar.public_id
-      ? userFromState.avatar.public_id
-      : '/images/default_avatar.jpg',
+    userFromState?.avatar && userFromState?.avatar.url ? userFromState.avatar.url : '/images/default_avatar.jpg',
   );
 
   const dispatch: AuthDispatch = useDispatch();
@@ -40,7 +34,7 @@ export default function UpdateProfile(): JSX.Element {
         email: userFromState.email,
         password: '',
       });
-      userFromState.avatar?.public_id && setAvatarPreview(userFromState.avatar.public_id);
+      userFromState.avatar?.url && setAvatarPreview(userFromState.avatar.url);
     }
 
     if (isSubmittedUpdate.current) {
@@ -51,27 +45,11 @@ export default function UpdateProfile(): JSX.Element {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [userFromState]);
 
-  const updateUser = async (userData: IUserFormData): Promise<void> => {
-    try {
-      const config = {
-        headers: {
-          'Content-Type': 'application/json',
-        },
-      };
-
-      await axios.post<{ status: number } | IErrorDto>('/api/me/update', userData, config);
-      await dispatch(loadUser());
-    } catch (error) {
-      const err = getError(error);
-      toast.error(err.errormsg);
-    }
-  };
-
   const submitHandler = async (e: React.SyntheticEvent<Element, Event>): Promise<void> => {
     e.preventDefault();
     isSubmittedUpdate.current = true;
     const userData = { ...user, avatar };
-    await updateUser(userData);
+    dispatch(updateUser(userData));
   };
 
   const onChange = (e: React.ChangeEvent<HTMLInputElement>): void => {
@@ -115,7 +93,7 @@ export default function UpdateProfile(): JSX.Element {
             <div className="form-group">
               <label htmlFor="email_field">Email</label>
               <input
-                type="email"
+                type="text"
                 id="email_field"
                 className="form-control"
                 name="email"

@@ -13,8 +13,10 @@ const config = {
   },
 };
 
+// * Commented below registerUser action as it is not being used anywhere,
+// * in particular regarding Register component.
 // Register user
-export const registerUser =
+/* export const registerUser =
   (userData: IUserFormData) =>
   async (dispatch: ThunkDispatch<AuthState, undefined, AuthAction>): Promise<AuthAction> => {
     try {
@@ -36,7 +38,7 @@ export const registerUser =
         payload: err,
       });
     }
-  };
+  }; */
 
 // Get current user
 export const loadUser =
@@ -47,8 +49,7 @@ export const loadUser =
         type: AuthActionType.LOAD_USER_REQUEST,
       });
 
-      // withCredentials: true will send cookies automatically e.g. session cookie
-      const { data } = await axios.get<IUserDto>('/api/me/profile', { withCredentials: true });
+      const { data } = await axios.get<IUserDto>('/api/me/profile');
 
       return dispatch({
         type: AuthActionType.LOAD_USER_SUCCESS,

@@ -65,6 +65,7 @@ export default function Register(): JSX.Element {
         return;
       }
       toast.success('Successfully registered!', {
+        autoClose: 2000,
         onClose: (): void => {
           window.location.href = '/';
         },

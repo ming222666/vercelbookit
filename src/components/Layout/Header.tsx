@@ -16,7 +16,7 @@ export type AuthDispatch = ThunkDispatch<AuthState, undefined, AnyAction>;
 export function Header(): JSX.Element {
   // https://stackoverflow.com/questions/59800913/type-safe-usedispatch-with-redux-thunk
   const dispatch: AuthDispatch = useDispatch();
-  const { user, error, success, loading } = useSelector((state: AppState) => state.auth);
+  const { user, error, loading } = useSelector((state: AppState) => state.auth);
 
   useEffect((): void => {
     async function fetchUser(): Promise<void> {
@@ -53,7 +53,7 @@ export function Header(): JSX.Element {
         </div>
 
         <div className="col-3 mt-3 mt-md-0 text-center">
-          {success && user ? (
+          {user ? (
             <div className="ml-4 dropdown d-line">
               {/* eslint-disable-next-line jsx-a11y/role-supports-aria-props */}
               <a
