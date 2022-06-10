@@ -15,12 +15,11 @@ export function Header(): JSX.Element {
   const { user, error, loading } = useSelector((state: AppState) => state.auth);
 
   useEffect((): void => {
-    async function fetchUser(): Promise<void> {
-      await dispatch(loadUser());
+    if (!user) {
+      dispatch(loadUser());
     }
-    fetchUser();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [user]);
 
   useEffect((): void => {
     if (error) {
@@ -41,11 +40,10 @@ export function Header(): JSX.Element {
       <div className="container">
         <div className="col-3 p-0">
           <div className="navbar-brand">
-            {/* eslint-disable-next-line @next/next/no-html-link-for-pages */}
-            <a href="/">
+            <Link href="/">
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img style={{ cursor: 'pointer' }} src="/images/bookit_logo.png" alt="BookIT" />
-            </a>
+            </Link>
           </div>
         </div>
 
