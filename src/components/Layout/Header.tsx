@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
 import Link from 'next/Link';
 import { signOut } from 'next-auth/react';
@@ -14,12 +14,24 @@ export function Header(): JSX.Element {
   const dispatch = useAppDispatch();
   const { user, error, loading } = useSelector((state: AppState) => state.auth);
 
-  useEffect((): void => {
-    if (!user) {
-      dispatch(loadUser());
-    }
+  const [isMounted, setIsMounted] = useState(false);
+
+  useEffect(
+    (): void => {
+      async function fetchUser(): Promise<void> {
+        await dispatch(loadUser());
+        setIsMounted(true);
+      }
+
+      if (!user) {
+        fetchUser();
+      } else {
+        setIsMounted(true);
+      }
+    },
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [user]);
+    [user],
+  );
 
   useEffect((): void => {
     if (error) {
@@ -84,7 +96,7 @@ export function Header(): JSX.Element {
             </div>
           ) : (
             <>
-              {loading ? null : (
+              {!loading && isMounted && (
                 <Link href="/login">
                   <a className="btn btn-danger px-4 text-white login-header-btn float-right">Login</a>
                 </Link>
