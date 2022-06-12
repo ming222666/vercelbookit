@@ -4,7 +4,12 @@ import { AuthState } from './models/AuthState';
 const initialAuthState: AuthState = {
   user: null,
   error: null,
-  loading: false,
+  /**
+   * Set initialAuthState.loading to true, so that
+   * [Login] button is not rendered on Header opening,
+   * thus preventing momentary flickering of [Login].
+   */
+  loading: true,
   success: null,
 };
 
