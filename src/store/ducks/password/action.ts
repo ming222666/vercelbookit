@@ -2,6 +2,7 @@ import { ThunkDispatch } from 'redux-thunk';
 import axios from 'axios';
 
 import { PasswordAction, PasswordActionType } from './types';
+import { PasswordState } from './models/PasswordState';
 import { IErrorDto } from '../../../db/interfaces';
 import { getError } from '../../../utils/getAxiosError';
 
@@ -14,7 +15,7 @@ const config = {
 // Forgot password action
 export const forgotPassword =
   (email: string) =>
-  async (dispatch: ThunkDispatch<undefined, undefined, PasswordAction>): Promise<PasswordAction> => {
+  async (dispatch: ThunkDispatch<PasswordState, undefined, PasswordAction>): Promise<PasswordAction> => {
     try {
       dispatch({
         type: PasswordActionType.FORGOT_PASSWORD_REQUEST,
@@ -38,7 +39,7 @@ export const forgotPassword =
 // Reset password action
 export const resetPassword =
   (token: string, newPassword: string, confirmPassword: string) =>
-  async (dispatch: ThunkDispatch<undefined, undefined, PasswordAction>): Promise<PasswordAction> => {
+  async (dispatch: ThunkDispatch<PasswordState, undefined, PasswordAction>): Promise<PasswordAction> => {
     try {
       dispatch({
         type: PasswordActionType.RESET_PASSWORD_REQUEST,
