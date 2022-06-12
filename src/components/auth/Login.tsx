@@ -59,9 +59,9 @@ export default function Login(): JSX.Element {
               />
             </div>
 
-            <a href="#" className="float-right mb-4">
-              Forgot Password?
-            </a>
+            <Link href="/password/forgot">
+              <a className="float-right mb-4">Forgot Password?</a>
+            </Link>
 
             <button id="login_button" type="submit" className="btn btn-block py-3" disabled={loading}>
               {loading ? <ButtonLoader /> : 'LOGIN'}
