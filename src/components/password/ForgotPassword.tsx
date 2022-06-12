@@ -5,7 +5,7 @@ import { toast } from 'react-toastify';
 
 import useAppDispatch from '../../hooks/useAppDispatch';
 import { AppState } from '../../store';
-import { forgotPassword } from '../../store/ducks/forgotPassword/action';
+import { forgotPassword } from '../../store/ducks/password/action';
 import ButtonLoader from '../Layout/ButtonLoader';
 
 export default function ForgotPassword(): JSX.Element {
@@ -13,7 +13,7 @@ export default function ForgotPassword(): JSX.Element {
 
   const dispatch = useAppDispatch();
 
-  const { error, success, loading } = useSelector((state: AppState) => state.forgotPassword);
+  const { error, success, loading } = useSelector((state: AppState) => state.password);
 
   useEffect((): void => {
     if (error) {

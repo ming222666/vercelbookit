@@ -1,7 +1,7 @@
 import nc from 'next-connect';
 
 import { onError, onNoMatch } from '../../../utils/onError';
-import { forgotPassword } from '../../../controllers/authControllers';
+import { forgotPassword } from '../../../controllers/passwordControllers';
 
 const handler = nc({ onError, onNoMatch });
 
