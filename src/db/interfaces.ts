@@ -70,3 +70,22 @@ export interface IUserDto {
   createdAt?: number;
   updatedAt?: number;
 }
+
+/**
+ * Booking
+ */
+export interface IBookingDto {
+  _id?: string;
+  room: string;
+  user: string;
+  checkInDate: number | null;
+  checkOutDate: number | null;
+  amountPaid: number;
+  daysOfStay: number;
+  paymentInfo: {
+    id: string;
+    status: string;
+  };
+  paidAt?: number;
+  createdAt?: number;
+}
