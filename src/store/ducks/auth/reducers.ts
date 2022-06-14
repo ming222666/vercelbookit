@@ -1,11 +1,11 @@
 import { AuthAction, AuthActionType } from './types';
 import { AuthState } from './models/AuthState';
 
-const initialAuthState: AuthState = {
+const initialState: AuthState = {
   user: null,
   error: null,
   /**
-   * Set initialAuthState.loading to true, so that
+   * Set initialState.loading to true, so that
    * [Login] button is not rendered on Header opening,
    * thus preventing momentary flickering of [Login].
    */
@@ -13,7 +13,7 @@ const initialAuthState: AuthState = {
   success: null,
 };
 
-const authReducer = (state: AuthState = initialAuthState, action: AuthAction): AuthState => {
+const authReducer = (state: AuthState = initialState, action: AuthAction): AuthState => {
   switch (action.type) {
     case AuthActionType.LOAD_USER_REQUEST:
       return {

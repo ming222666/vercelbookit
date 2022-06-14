@@ -1,17 +1,14 @@
 import { RoomDetailsAction, RoomDetailsActionType } from './types';
 import { RoomDetailsState } from './models/RoomDetailsState';
 
-const initialRoomDetailsState: RoomDetailsState = {
+const initialState: RoomDetailsState = {
   room: null,
   error: null,
   loading: false,
   success: null,
 };
 
-const roomDetailsReducer = (
-  state: RoomDetailsState = initialRoomDetailsState,
-  action: RoomDetailsAction,
-): RoomDetailsState => {
+const roomDetailsReducer = (state: RoomDetailsState = initialState, action: RoomDetailsAction): RoomDetailsState => {
   switch (action.type) {
     case RoomDetailsActionType.ROOM_DETAILS_REQUEST:
       return {

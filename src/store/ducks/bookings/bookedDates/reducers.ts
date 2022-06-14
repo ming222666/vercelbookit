@@ -1,7 +1,7 @@
 import { BookedDatesAction, BookedDatesActionType } from './types';
 import { BookedDatesState } from './models/BookedDatesState';
 
-const initialBookedDatesState: BookedDatesState = {
+const initialState: BookedDatesState = {
   roomId: '',
   dates: [],
   error: null,
@@ -9,10 +9,7 @@ const initialBookedDatesState: BookedDatesState = {
   success: null,
 };
 
-const bookedDatesReducer = (
-  state: BookedDatesState = initialBookedDatesState,
-  action: BookedDatesAction,
-): BookedDatesState => {
+const bookedDatesReducer = (state: BookedDatesState = initialState, action: BookedDatesAction): BookedDatesState => {
   switch (action.type) {
     case BookedDatesActionType.LOAD_BOOKED_DATES_REQUEST:
       return {

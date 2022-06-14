@@ -1,7 +1,7 @@
 import { AllRoomsAction, AllRoomsActionType } from './types';
 import { AllRoomsState } from './models/AllRoomsState';
 
-const initialAllRoomsState: AllRoomsState = {
+const initialState: AllRoomsState = {
   roomsCount: 0,
   resPerPage: 1,
   filteredRoomsCount: 0,
@@ -11,7 +11,7 @@ const initialAllRoomsState: AllRoomsState = {
   success: null,
 };
 
-const allRoomsReducer = (state: AllRoomsState = initialAllRoomsState, action: AllRoomsAction): AllRoomsState => {
+const allRoomsReducer = (state: AllRoomsState = initialState, action: AllRoomsAction): AllRoomsState => {
   switch (action.type) {
     case AllRoomsActionType.ALL_ROOMS_REQUEST:
       return {

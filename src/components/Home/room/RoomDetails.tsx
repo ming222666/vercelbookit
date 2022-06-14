@@ -9,38 +9,34 @@ import { toast } from 'react-toastify';
 import { Carousel } from 'react-bootstrap';
 import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
-// import Moment from 'moment';
-import * as Moment from 'moment';
-import { extendMoment } from 'moment-range';
-
-const moment = extendMoment(Moment);
 
 import useAppDispatch from '../../../hooks/useAppDispatch';
 import { AppState } from '../../../store';
 import { IBookingDto } from '../../../db/interfaces';
 import { getBookedDates } from '../../../store/ducks/bookings/bookedDates/action';
+import { getRoomBookingAvailability } from '../../../store/ducks/bookings/roomBookingAvailability/action';
 import { RoomFeatures } from './RoomFeatures';
 import { getError } from '../../../utils/getAxiosError';
 
 export function RoomDetails(): JSX.Element {
-  const [checkInOutDates, setCheckInOutDates] = useState<[Date | null, Date | null]>([new Date(), null]);
-
+  const [checkInDate, setCheckInDate] = useState<Date | null>(null);
+  const [checkOutDate, setCheckOutDate] = useState<Date | null>(null);
   const [daysOfStay, setDaysOfStay] = useState(0);
 
-  const { room, error } = useSelector((state: AppState) => state.roomDetails);
+  const router = useRouter();
+  const dispatch = useAppDispatch();
 
   const { dates: bookedDates, error: bookedDatesError } = useSelector((state: AppState) => state.bookings.bookedDates);
-
   const { user } = useSelector((state: AppState) => state.auth);
+  const { room, error } = useSelector((state: AppState) => state.roomDetails);
+  const { isAvailable, loading: roomBookingAvailabilityLoading } = useSelector(
+    (state: AppState) => state.bookings.roomBookingAvailability,
+  );
 
   let userId = '';
   if (user) userId = user._id ? user._id : '';
 
-  const router = useRouter();
-
   const roomId = router.query.id as string;
-
-  const dispatch = useAppDispatch();
 
   const excludedDates: Date[] = [];
   bookedDates.forEach((date) => {
@@ -50,7 +46,8 @@ export function RoomDetails(): JSX.Element {
   const onChange = (dates: [Date | null, Date | null]): void => {
     const [checkInDate, checkOutDate] = dates;
 
-    setCheckInOutDates([checkInDate, checkOutDate]);
+    setCheckInDate(checkInDate);
+    setCheckOutDate(checkOutDate);
 
     if (checkInDate && checkOutDate) {
       // Calclate days of stay
@@ -59,7 +56,7 @@ export function RoomDetails(): JSX.Element {
 
       setDaysOfStay(days);
 
-      // dispatch(checkBooking(id, checkInDate.toISOString(), checkOutDate.toISOString()))
+      dispatch(getRoomBookingAvailability(roomId, checkInDate.getTime(), checkOutDate.getTime()));
     }
   };
 
@@ -81,12 +78,12 @@ export function RoomDetails(): JSX.Element {
     if (roomId) dispatch(getBookedDates(roomId));
   }, [dispatch, roomId]);
 
-  const newBookingHandler = async () => {
+  const newBookingHandler = async (): Promise<void> => {
     const bookingData: IBookingDto = {
       room: roomId,
       user: userId,
-      checkInDate: checkInOutDates[0] && checkInOutDates[0].getTime(),
-      checkOutDate: checkInOutDates[1] && checkInOutDates[1].getTime(),
+      checkInDate: checkInDate && checkInDate.getTime(),
+      checkOutDate: checkOutDate && checkOutDate.getTime(),
       daysOfStay,
       amountPaid: 90,
       paymentInfo: {
@@ -102,40 +99,12 @@ export function RoomDetails(): JSX.Element {
         },
       };
 
-      const { data } = await axios.post<{ status: number; booking: IBookingDto }>('/api/bookings', bookingData, config);
-
-      console.log('yyyyyyyyyyyyyyyyyy', data);
+      await axios.post<{ status: number; booking: IBookingDto }>('/api/bookings', bookingData, config);
     } catch (error) {
       const err = getError(error);
       toast.error(err.errormsg);
     }
   };
-
-  // const range = moment.range(moment(checkInOutDates[0]), moment(checkInOutDates[1]));
-
-  if (checkInOutDates[1]) {
-    const range = moment.range(moment(checkInOutDates[0]), moment(checkInOutDates[1]));
-    console.log('range.toString() notnull', range.toString());
-    console.log('getTime() notnull', checkInOutDates[0].getTime());
-
-    const dates = Array.from(range.by('day'));
-    dates.forEach((element, i) => {
-      console.log('element notnull ' + i, element.toString());
-    });
-  } else {
-    const range2 = moment.range(moment(checkInOutDates[0]), moment(checkInOutDates[0]));
-    console.log('range2.toString() NULL', range2.toString());
-    console.log('getTime() NULL', checkInOutDates[0].getTime());
-
-    const dates = Array.from(range2.by('day'));
-    dates.forEach((element, i) => {
-      console.log('element NULL ' + i, element.toString());
-    });
-  }
-
-  // const dates = Array.from(range.by('day'));
-  // console.log('arry', dates);
-  //////////////////// console.log('range.toString()', range.toString());
 
   return (
     <>
@@ -189,19 +158,57 @@ export function RoomDetails(): JSX.Element {
 
               <DatePicker
                 className="w-100"
-                selected={checkInOutDates[0]}
+                selected={checkInDate}
                 onChange={onChange}
-                startDate={checkInOutDates[0]}
-                endDate={checkInOutDates[1]}
+                startDate={checkInDate}
+                endDate={checkOutDate}
                 minDate={new Date()}
                 excludeDates={excludedDates}
                 selectsRange
                 inline
               />
 
-              <button className="btn btn-block py-3 booking-btn" onClick={newBookingHandler}>
-                Pay
-              </button>
+              {isAvailable === true && (
+                <div className="alert alert-success my-3 font-weight-bold">Room is available. Book now.</div>
+              )}
+
+              {isAvailable === false && (
+                <div className="alert alert-danger my-3 font-weight-bold">Room not available. Try different dates.</div>
+              )}
+
+              {isAvailable && !user && (
+                <div className="alert alert-danger my-3 font-weight-bold">Login to book room.</div>
+              )}
+
+              {isAvailable && user && (
+                <>
+                  <div className="alert alert-success my-3">
+                    Check In Date: <span className="font-weight-bold">{checkInDate?.toString().substring(0, 15)}</span>
+                  </div>
+                  <div className={'alert my-3 ' + `${checkOutDate ? 'alert-success' : 'alert-danger text-center'}`}>
+                    {checkOutDate ? (
+                      <>
+                        <span>Check Out Date: </span>
+                        <span className="font-weight-bold">{checkOutDate.toString().substring(0, 15)}</span>
+                      </>
+                    ) : (
+                      <span className="font-weight-bold" style={{ color: '#ff0000' }}>
+                        Please pick Check Out Date!
+                      </span>
+                    )}
+                  </div>
+                  <div className="alert alert-success my-3 text-center">
+                    Days of Stay: <span className="font-weight-bold">{checkOutDate ? daysOfStay : '?'}</span>
+                  </div>
+                  <button
+                    className="btn btn-block py-3 booking-btn"
+                    onClick={newBookingHandler}
+                    disabled={!checkOutDate || roomBookingAvailabilityLoading ? true : false}
+                  >
+                    {daysOfStay && room && `Pay - $${checkOutDate ? daysOfStay * room.pricePerNight : '?'}`}
+                  </button>
+                </>
+              )}
             </div>
           </div>
         </div>
