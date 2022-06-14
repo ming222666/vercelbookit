@@ -76,8 +76,6 @@ const currentUserProfile = async (req: NextApiRequest, res: NextApiResponse<IUse
     role: user.role,
     createdAt: user.createdAt,
     updatedAt: user.updatedAt,
-    resetPasswordToken: user.resetPasswordToken,
-    resetPasswordExpire: user.resetPasswordExpire,
   });
 };
 
@@ -131,8 +129,6 @@ const updateProfile = async (req: UserNextApiRequest, res: NextApiResponse<IUser
     role: user.role,
     createdAt: user.createdAt,
     updatedAt: user.updatedAt,
-    resetPasswordToken: user.resetPasswordToken,
-    resetPasswordExpire: user.resetPasswordExpire,
   });
 };
 

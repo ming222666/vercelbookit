@@ -47,10 +47,11 @@ export function Header(): JSX.Element {
       <div className="container">
         <div className="col-3 p-0">
           <div className="navbar-brand">
-            <Link href="/">
+            {/* eslint-disable-next-line @next/next/no-html-link-for-pages */}
+            <a href="/">
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img style={{ cursor: 'pointer' }} src="/images/bookit_logo.png" alt="BookIT" />
-            </Link>
+            </a>
           </div>
         </div>
 

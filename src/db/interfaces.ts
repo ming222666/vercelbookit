@@ -70,6 +70,4 @@ export interface IUserDto {
   role?: string;
   createdAt?: number;
   updatedAt?: number;
-  resetPasswordToken?: string;
-  resetPasswordExpire?: number;
 }
