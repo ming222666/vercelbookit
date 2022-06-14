@@ -97,7 +97,8 @@ const updateProfile = async (req: UserNextApiRequest, res: NextApiResponse<IUser
   user.name = req.body.name;
   user.email = req.body.email;
 
-  if (req.body.password) user.password = req.body.password;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  if (req.body.password) (user as any).password = req.body.password;
 
   // Update avatar
   if (req.body.avatar !== '') {
