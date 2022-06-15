@@ -4,7 +4,7 @@ import db from '../db/db';
 import { IRoomDto, IErrorDto, IAllRoomsDto } from '../db/interfaces';
 import Room from '../db/models/Room';
 import APIFeatures from '../utils/apiFeatures';
-import IWithBodyNextApiRequest from './interfaces/IWithBodyNextApiRequest';
+import { IWithBodyNextApiRequest } from './interfaces';
 
 type RoomNextApiRequest = IWithBodyNextApiRequest<IRoomDto>;
 

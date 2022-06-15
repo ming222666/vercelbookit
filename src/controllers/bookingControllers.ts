@@ -8,7 +8,7 @@ const moment = extendMoment(Moment);
 import db from '../db/db';
 import { IBookingDto, IErrorDto } from '../db/interfaces';
 import Booking from '../db/models/Booking';
-import IWithBodyNextApiRequest from './interfaces/IWithBodyNextApiRequest';
+import { IWithBodyNextApiRequest } from './interfaces';
 
 type NewBookingNextApiRequest = IWithBodyNextApiRequest<IBookingDto>;
 

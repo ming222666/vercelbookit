@@ -7,7 +7,7 @@ import crypto from 'crypto';
 import db from '../db/db';
 import { IErrorDto } from '../db/interfaces';
 import User from '../db/models/User';
-import IWithBodyNextApiRequest from './interfaces/IWithBodyNextApiRequest';
+import { IWithBodyNextApiRequest } from './interfaces';
 import sendEmail from '../utils/sendEmail';
 
 cloudinary.config({

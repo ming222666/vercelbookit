@@ -6,8 +6,8 @@ import { HydratedDocument } from 'mongoose';
 import db from '../db/db';
 import { IUserDto, IErrorDto } from '../db/interfaces';
 import User from '../db/models/User';
-import IWithBodyNextApiRequest from './interfaces/IWithBodyNextApiRequest';
-import IUserFormData from './interfaces/IUserFormData';
+import { IWithBodyNextApiRequest } from './interfaces';
+import { IUserFormData } from './interfaces';
 
 cloudinary.config({
   cloud_name: process.env.CLOUDINARY_CLOUD_NAME,

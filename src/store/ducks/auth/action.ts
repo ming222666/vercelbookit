@@ -5,7 +5,7 @@ import { AuthAction, AuthActionType } from './types';
 import { AuthState } from './models/AuthState';
 import { IUserDto } from '../../../db/interfaces';
 import { getError } from '../../../utils/getAxiosError';
-import IUserFormData from '../../../controllers/interfaces/IUserFormData';
+import { IUserFormData } from '../../../controllers/interfaces';
 
 const config = {
   headers: {

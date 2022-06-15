@@ -5,7 +5,7 @@ import axios from 'axios';
 import { toast } from 'react-toastify';
 
 import ButtonLoader from '../Layout/ButtonLoader';
-import IUserFormData from '../../controllers/interfaces/IUserFormData';
+import { IUserFormData } from '../../controllers/interfaces';
 import { IErrorDto } from '../../db/interfaces';
 import { getError } from '../../utils/getAxiosError';
 
