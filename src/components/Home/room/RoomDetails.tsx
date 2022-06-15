@@ -75,7 +75,18 @@ export function RoomDetails(): JSX.Element {
   }, [bookedDatesError]);
 
   useEffect(() => {
-    if (roomId) dispatch(getBookedDates(roomId));
+    /**
+     * Seems that a little timeout delay is needed.
+     * Without timeout, the api of below getBookedDates() action'll fail due to mongo db connection unavailable issue --- (1)
+     * This, after experiment seems to suggest, is due to Header component also making a db connection call.
+     * Close proximity of the 2 db calls seems to be the cause of issue mentioned at line (1) above.
+     */
+    if (roomId) {
+      const t = setTimeout(() => {
+        dispatch(getBookedDates(roomId));
+        clearTimeout(t);
+      }, 500);
+    }
   }, [dispatch, roomId]);
 
   const newBookingHandler = async (): Promise<void> => {

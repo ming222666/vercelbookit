@@ -96,8 +96,6 @@ const checkBookedDatesOfRoom = async (
 
   const bookings = await Booking.find({ room: roomId });
 
-  await db.disconnect();
-
   let bookedDates: number[] = [];
 
   bookings.forEach((booking) => {
@@ -106,6 +104,8 @@ const checkBookedDatesOfRoom = async (
     const dates = Array.from(range.by('day')).map((m) => moment(m).valueOf() as number);
     bookedDates = bookedDates.concat(dates);
   });
+
+  await db.disconnect();
 
   // res.status(200).send({ roomId: roomId as string, dates: [1655306666000, 1655606666000] });
   res.status(200).send({ roomId: roomId as string, dates: bookedDates });
