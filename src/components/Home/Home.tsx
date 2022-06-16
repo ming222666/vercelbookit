@@ -1,7 +1,7 @@
 import React, { useEffect } from 'react';
 import { useSelector } from 'react-redux';
 import { useRouter } from 'next/router';
-import Link from 'next/Link';
+import Link from 'next/link';
 
 import { toast } from 'react-toastify';
 import Pagination from 'react-js-pagination';
@@ -16,7 +16,6 @@ export function Home(): JSX.Element {
     if (error) {
       toast.error(error.errormsg);
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [error]);
 
   const router = useRouter();

@@ -9,6 +9,7 @@ import db from '../db/db';
 import { IBookingDto, IErrorDto } from '../db/interfaces';
 import Booking from '../db/models/Booking';
 import { IWithBodyNextApiRequest } from './interfaces';
+import { IBookingExtended } from '../controllers/interfaces';
 
 type NewBookingNextApiRequest = IWithBodyNextApiRequest<IBookingDto>;
 
@@ -111,4 +112,53 @@ const checkBookedDatesOfRoom = async (
   res.status(200).send({ roomId: roomId as string, dates: bookedDates });
 };
 
-export { newBooking, checkRoomBookingAvailability, checkBookedDatesOfRoom };
+// Check bookings of current user   =>   /api/bookings/me
+const myBookings = async (
+  req: NextApiRequest,
+  res: NextApiResponse<{ user: string; bookings: IBookingExtended[] } | IErrorDto>,
+): Promise<void> => {
+  await db.connect();
+
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const bookings: IBookingExtended[] = await Booking.find({ user: (req as any).user._id })
+    .populate({
+      path: 'room',
+      select: 'name pricePerNight images',
+    })
+    .populate({
+      path: 'user',
+      select: 'name email',
+    })
+    .sort({ checkInDate: 1 })
+    .lean();
+
+  await db.disconnect();
+
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  res.status(200).send({ user: (req as any).user._id, bookings });
+};
+
+// Check booking details   =>   /api/bookings/:id
+const getBookingDetails = async (
+  req: NextApiRequest,
+  res: NextApiResponse<IBookingExtended | IErrorDto>,
+): Promise<void> => {
+  await db.connect();
+
+  const booking: IBookingExtended = await Booking.findById(req.query.id)
+    .populate({
+      path: 'room',
+      select: 'name pricePerNight images',
+    })
+    .populate({
+      path: 'user',
+      select: 'name email',
+    })
+    .lean();
+
+  await db.disconnect();
+
+  res.status(200).send(booking);
+};
+
+export { newBooking, checkRoomBookingAvailability, checkBookedDatesOfRoom, myBookings, getBookingDetails };

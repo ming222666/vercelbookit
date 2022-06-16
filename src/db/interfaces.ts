@@ -89,3 +89,9 @@ export interface IBookingDto {
   paidAt?: number;
   createdAt?: number;
 }
+
+export interface ILES {
+  loading: boolean;
+  error: IErrorDto | null;
+  success: true | null;
+}

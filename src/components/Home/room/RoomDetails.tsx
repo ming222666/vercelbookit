@@ -64,14 +64,12 @@ export function RoomDetails(): JSX.Element {
     if (error) {
       toast.error(error.errormsg);
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [error]);
 
   useEffect((): void => {
     if (bookedDatesError) {
       toast.error(bookedDatesError.errormsg);
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [bookedDatesError]);
 
   useEffect(() => {

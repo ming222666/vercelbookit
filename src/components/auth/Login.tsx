@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import Link from 'next/Link';
+import Link from 'next/link';
 import { signIn } from 'next-auth/react';
 
 import { toast } from 'react-toastify';

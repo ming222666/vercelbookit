@@ -1,6 +1,6 @@
 import React, { useEffect } from 'react';
 import { useSelector } from 'react-redux';
-import Link from 'next/Link';
+import Link from 'next/link';
 import { signOut } from 'next-auth/react';
 
 import { toast } from 'react-toastify';
