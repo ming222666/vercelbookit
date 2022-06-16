@@ -3,13 +3,13 @@ import Link from 'next/link';
 
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const { MDBDataTable } = require('mdbreact');
-// import easyinvoice from 'easyinvoice';
+import easyinvoice from 'easyinvoice';
 
 import { useSelector } from 'react-redux';
 import { toast } from 'react-toastify';
 
-// import useAppDispatch from '../../hooks/useAppDispatch';
 import { AppState } from '../../store';
+import { IBookingExtended } from '../../controllers/interfaces';
 
 interface IRow {
   id: string | undefined;
@@ -25,8 +25,6 @@ interface IData {
 }
 
 export default function MyBookings(): JSX.Element {
-  // const dispatch = useAppDispatch();
-
   const { bookings, error } = useSelector((state: AppState) => state.bookings.myBookings);
 
   useEffect((): void => {
@@ -82,7 +80,12 @@ export default function MyBookings(): JSX.Element {
                 </a>
               </Link>
 
-              <button className="btn btn-success mx-2" /* onClick={(): void => downloadInvoice(booking)} */>
+              <button
+                className="btn btn-success mx-2"
+                onClick={(): void => {
+                  downloadInvoice(booking);
+                }}
+              >
                 <i className="fa fa-download"></i>
               </button>
             </>
@@ -93,46 +96,50 @@ export default function MyBookings(): JSX.Element {
     return data;
   };
 
-  // const downloadInvoice = async (booking) => {
-  //   const data = {
-  //     documentTitle: 'Booking INVOICE', //Defaults to INVOICE
-  //     currency: 'USD',
-  //     taxNotation: 'vat', //or gst
-  //     marginTop: 25,
-  //     marginRight: 25,
-  //     marginLeft: 25,
-  //     marginBottom: 25,
-  //     logo: 'https://res.cloudinary.com/bookit/image/upload/v1617904918/bookit/bookit_logo_cbgjzv.png',
-  //     sender: {
-  //       company: 'Book IT',
-  //       address: '13th Street. 47 W 13th St',
-  //       zip: '10001',
-  //       city: 'New York',
-  //       country: 'United States',
-  //     },
-  //     client: {
-  //       company: `${booking.user.name}`,
-  //       address: `${booking.user.email}`,
-  //       zip: '',
-  //       city: `Check In: ${new Date(booking.checkInDate).toLocaleString('en-US')}`,
-  //       country: `Check In: ${new Date(booking.checkOutDate).toLocaleString('en-US')}`,
-  //     },
-  //     invoiceNumber: `${booking._id}`,
-  //     invoiceDate: `${new Date(Date.now()).toLocaleString('en-US')}`,
-  //     products: [
-  //       {
-  //         quantity: `${booking.daysOfStay}`,
-  //         description: `${booking.room.name}`,
-  //         tax: 0,
-  //         price: booking.room.pricePerNight,
-  //       },
-  //     ],
-  //     bottomNotice: 'This is auto generated Invoice of your booking on Book IT.',
-  //   };
-  //
-  //   const result = await easyinvoice.createInvoice(data);
-  //   easyinvoice.download(`invoice_${booking._id}.pdf`, result.pdf);
-  // };
+  const downloadInvoice = async (booking: IBookingExtended): Promise<void> => {
+    const data = {
+      'document-title': 'Booking INVOICE', //Defaults to INVOICE
+      currency: 'USD',
+      taxNotation: 'vat', //or gst
+      marginTop: 25,
+      marginRight: 25,
+      marginLeft: 25,
+      marginBottom: 25,
+      logo: 'https://res.cloudinary.com/bookit/image/upload/v1617904918/bookit/bookit_logo_cbgjzv.png',
+      sender: {
+        company: 'Book IT',
+        address: '13th Street. 47 W 13th St',
+        zip: '10001',
+        city: 'New York',
+        country: 'United States',
+      },
+      client: {
+        company: `${booking.user.name}`,
+        address: `${booking.user.email}`,
+        zip: '',
+        city: `Check In: ${new Date(booking.checkInDate ? booking.checkInDate : 0).toLocaleString('en-US')}`,
+        country: `Check Out: ${new Date(booking.checkOutDate ? booking.checkOutDate : 0).toLocaleString('en-US')}`,
+      },
+      invoiceNumber: `${booking._id}`,
+      invoiceDate: `${new Date(Date.now()).toLocaleString('en-US')}`,
+      products: [
+        {
+          quantity: `${booking.daysOfStay}`,
+          description: `${booking.room.name}`,
+          tax: 0,
+          price: booking.room.pricePerNight,
+        },
+      ],
+      'bottom-notice': 'This is auto generated Invoice of your booking on Book IT.',
+      setting: {
+        currency: 'SGD',
+        'document-title': 'Booking INVOICE', //Defaults to INVOICE
+      },
+    };
+
+    const result = await easyinvoice.createInvoice(data);
+    easyinvoice.download(`invoice_${booking._id}.pdf`, result.pdf);
+  };
 
   return (
     <div className="container container-fluid">
