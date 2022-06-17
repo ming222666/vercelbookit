@@ -1,9 +1,9 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useRef, useState, useMemo, useCallback } from 'react';
 import Link from 'next/link';
 
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const { MDBDataTable } = require('mdbreact');
-import easyinvoice from 'easyinvoice';
+import { Document, Page, Text, View, PDFViewer } from '@react-pdf/renderer';
 
 import { useSelector } from 'react-redux';
 import { toast } from 'react-toastify';
@@ -24,6 +24,13 @@ interface IData {
   rows: IRow[];
 }
 
+function MDBDataTableWrapper(props: { data: IData; onPageChange: () => void }): JSX.Element {
+  return (
+    <MDBDataTable data={props.data} className="px-3" bordered striped hover small onPageChange={props.onPageChange} />
+  );
+}
+export const MemoizedMDBDataTable = React.memo(MDBDataTableWrapper);
+
 export default function MyBookings(): JSX.Element {
   const { bookings, error } = useSelector((state: AppState) => state.bookings.myBookings);
 
@@ -33,7 +40,7 @@ export default function MyBookings(): JSX.Element {
     }
   }, [error]);
 
-  const setBookings = (): IData => {
+  const memoizedDataForTable = useMemo((): IData => {
     const data: IData = {
       columns: [
         {
@@ -80,72 +87,255 @@ export default function MyBookings(): JSX.Element {
                 </a>
               </Link>
 
-              <button
+              <a
                 className="btn btn-success mx-2"
                 onClick={(): void => {
-                  downloadInvoice(booking);
+                  createInvoice(booking);
                 }}
+                role="button"
               >
                 <i className="fa fa-download"></i>
-              </button>
+              </a>
             </>
           ),
         });
       });
 
     return data;
-  };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
-  const downloadInvoice = async (booking: IBookingExtended): Promise<void> => {
-    const data = {
-      'document-title': 'Booking INVOICE', //Defaults to INVOICE
-      currency: 'USD',
-      taxNotation: 'vat', //or gst
-      marginTop: 25,
-      marginRight: 25,
-      marginLeft: 25,
-      marginBottom: 25,
-      logo: 'https://res.cloudinary.com/bookit/image/upload/v1617904918/bookit/bookit_logo_cbgjzv.png',
-      sender: {
-        company: 'Book IT',
-        address: '13th Street. 47 W 13th St',
-        zip: '10001',
-        city: 'New York',
-        country: 'United States',
-      },
-      client: {
-        company: `${booking.user.name}`,
-        address: `${booking.user.email}`,
-        zip: '',
-        city: `Check In: ${new Date(booking.checkInDate ? booking.checkInDate : 0).toLocaleString('en-US')}`,
-        country: `Check Out: ${new Date(booking.checkOutDate ? booking.checkOutDate : 0).toLocaleString('en-US')}`,
-      },
-      invoiceNumber: `${booking._id}`,
-      invoiceDate: `${new Date(Date.now()).toLocaleString('en-US')}`,
-      products: [
-        {
-          quantity: `${booking.daysOfStay}`,
-          description: `${booking.room.name}`,
-          tax: 0,
-          price: booking.room.pricePerNight,
-        },
-      ],
-      'bottom-notice': 'This is auto generated Invoice of your booking on Book IT.',
-      setting: {
-        currency: 'SGD',
-        'document-title': 'Booking INVOICE', //Defaults to INVOICE
-      },
-    };
+  const memoizedCallback = useCallback(() => {
+    setBookingIdToPreviewInvoice('');
+  }, []);
 
-    const result = await easyinvoice.createInvoice(data);
-    easyinvoice.download(`invoice_${booking._id}.pdf`, result.pdf);
+  const invoiceDivRef = useRef<HTMLDivElement>(null);
+  const invoiceRef = useRef(<></>);
+  const [bookingIdToPreviewInvoice, setBookingIdToPreviewInvoice] = useState<string | undefined>('');
+
+  useEffect((): void => {
+    if (bookingIdToPreviewInvoice) {
+      invoiceDivRef.current?.scrollIntoView({ behavior: 'smooth' });
+    }
+  }, [bookingIdToPreviewInvoice]);
+
+  const createInvoice = (booking: IBookingExtended): void => {
+    invoiceRef.current = (
+      <PDFViewer style={{ width: window.innerWidth, height: window.innerHeight }}>
+        {/* Start of the document*/}
+        <Document>
+          {/*render a single page*/}
+          <Page size="A4" style={{ backgroundColor: '#fff', color: '#000' }}>
+            <View style={{ margin: 20, padding: 20, textAlign: 'right' }}>
+              <Text style={{ fontSize: 15 }}>Booking INVOICE</Text>
+              <Text> </Text>
+              <Text style={{ fontSize: 12, fontFamily: 'Helvetica-Bold' }}>Book IT</Text>
+              <Text style={{ fontSize: 10 }}>13th Street. 47 W 13th St</Text>
+              <Text style={{ fontSize: 10 }}>10001, New York</Text>
+              <Text style={{ fontSize: 10 }}>United States</Text>
+              <Text> </Text>
+              <Text> </Text>
+              <View
+                style={{
+                  borderBottomColor: 'black',
+                  borderBottomWidth: 2,
+                }}
+              />
+            </View>
+            <View
+              style={{
+                margin: '10 20',
+                padding: '10 20',
+              }}
+            >
+              <View
+                style={{
+                  display: 'flex',
+                  flexDirection: 'row',
+                  justifyContent: 'space-between',
+                }}
+              >
+                <Text style={{ fontSize: 12, fontFamily: 'Helvetica-Bold' }}>{booking.user.name}</Text>
+                <Text style={{ fontSize: 12, fontFamily: 'Helvetica-Bold', marginLeft: 'auto' }}>Invoice Number: </Text>
+                <Text style={{ fontSize: 12 }}>{booking._id}</Text>
+              </View>
+              <View
+                style={{
+                  display: 'flex',
+                  flexDirection: 'row',
+                  justifyContent: 'space-between',
+                }}
+              >
+                <Text style={{ fontSize: 12 }}>{booking.user.email}</Text>
+                <Text style={{ fontSize: 12, fontFamily: 'Helvetica-Bold', marginLeft: 'auto' }}>Invoice Date: </Text>
+                <Text style={{ fontSize: 12 }}>{new Date(Date.now()).toLocaleString('en-US')}</Text>
+              </View>
+              <View
+                style={{
+                  display: 'flex',
+                  flexDirection: 'row',
+                }}
+              >
+                <Text style={{ fontSize: 12 }}>Check In: {'   '}</Text>
+                <Text style={{ fontSize: 12 }}>
+                  {new Date(booking.checkInDate ? booking.checkInDate : 0).toLocaleString('en-US')}
+                </Text>
+              </View>
+              <View
+                style={{
+                  display: 'flex',
+                  flexDirection: 'row',
+                }}
+              >
+                <Text style={{ fontSize: 12 }}>Check Out: </Text>
+                <Text style={{ fontSize: 12 }}>
+                  {new Date(booking.checkOutDate ? booking.checkOutDate : 0).toLocaleString('en-US')}
+                </Text>
+              </View>
+            </View>
+            <View> </View>
+            <View> </View>
+            <View> </View>
+            <View> </View>
+
+            <View
+              style={{
+                borderBottomColor: 'black',
+                borderBottomWidth: 2,
+                display: 'flex',
+                flexDirection: 'row',
+                margin: '20 40 10 40',
+                padding: '20 0 10 0',
+                fontFamily: 'Helvetica-Bold',
+              }}
+            >
+              <View style={{ width: '60%' }}>
+                <Text style={{ fontSize: 12 }}>Room</Text>
+              </View>
+              <View style={{ width: '40%', display: 'flex', flexDirection: 'row' }}>
+                <View style={{ flex: '1 1 0', textAlign: 'right' }}>
+                  <Text style={{ fontSize: 12 }}>Days Stay</Text>
+                </View>
+                <View style={{ flex: '1 1 0', textAlign: 'right' }}>
+                  <Text style={{ fontSize: 12 }}>Price</Text>
+                </View>
+                <View style={{ flex: '1 1 0', textAlign: 'right' }}>
+                  <Text style={{ fontSize: 12 }}>Total</Text>
+                </View>
+              </View>
+            </View>
+
+            <View
+              style={{
+                borderBottomColor: 'black',
+                borderBottomWidth: 2,
+                display: 'flex',
+                flexDirection: 'row',
+                margin: '0 40 0 40',
+                padding: '0 0 10 0',
+              }}
+            >
+              <View style={{ width: '60%' }}>
+                <Text style={{ fontSize: 12 }}>{booking.room.name}</Text>
+              </View>
+              <View style={{ width: '40%', display: 'flex', flexDirection: 'row' }}>
+                <View style={{ flex: '1 1 0', textAlign: 'right' }}>
+                  <Text style={{ fontSize: 12 }}>{booking.daysOfStay}</Text>
+                </View>
+                <View style={{ flex: '1 1 0', textAlign: 'right' }}>
+                  <Text style={{ fontSize: 12 }}>${booking.room.pricePerNight}</Text>
+                </View>
+                <View style={{ flex: '1 1 0', textAlign: 'right' }}>
+                  <Text style={{ fontSize: 12 }}>${booking.amountPaid}</Text>
+                </View>
+              </View>
+            </View>
+
+            <View
+              style={{
+                display: 'flex',
+                flexDirection: 'row',
+                margin: '20 40 0 40',
+                padding: '20 0 10 0',
+                fontFamily: 'Helvetica-Bold',
+              }}
+            >
+              <View style={{ width: '60%' }}>
+                <Text> </Text>
+              </View>
+              <View
+                style={{
+                  width: '40%',
+                  display: 'flex',
+                  flexDirection: 'row',
+                  borderBottomColor: 'black',
+                  borderBottomWidth: 2,
+                }}
+              >
+                <View style={{ flex: '1 1 0' }}>
+                  <Text> </Text>
+                </View>
+                <View style={{ flex: '1 1 0', textAlign: 'right' }}>
+                  <Text style={{ fontSize: 12 }}>Subtotal:</Text>
+                </View>
+                <View style={{ flex: '1 1 0', textAlign: 'right' }}>
+                  <Text style={{ fontSize: 12, fontFamily: 'Helvetica' }}>${booking.amountPaid}</Text>
+                </View>
+              </View>
+            </View>
+
+            <View
+              style={{
+                display: 'flex',
+                flexDirection: 'row',
+                margin: '0 40 10 40',
+                padding: '0 0 10 0',
+                fontFamily: 'Helvetica-Bold',
+              }}
+            >
+              <View style={{ width: '60%' }}>
+                <Text> </Text>
+              </View>
+              <View
+                style={{
+                  width: '40%',
+                  display: 'flex',
+                  flexDirection: 'row',
+                }}
+              >
+                <View style={{ flex: '1 1 0' }}>
+                  <Text> </Text>
+                </View>
+                <View style={{ flex: '1 1 0', textAlign: 'right' }}>
+                  <Text style={{ fontSize: 12 }}>Total:</Text>
+                </View>
+                <View style={{ flex: '1 1 0', textAlign: 'right' }}>
+                  <Text style={{ fontSize: 12, fontFamily: 'Helvetica' }}>${booking.amountPaid}</Text>
+                </View>
+              </View>
+            </View>
+
+            <View style={{ margin: 'auto', padding: 0, fontSize: 12 }}>
+              <Text>This is auto generated Invoice of your booking on Book IT.</Text>
+            </View>
+          </Page>
+        </Document>
+      </PDFViewer>
+    );
+
+    setBookingIdToPreviewInvoice(booking._id);
   };
 
   return (
-    <div className="container container-fluid">
-      <h1 className="my-5">My Bookings</h1>
+    <>
+      <div className="container container-fluid">
+        <h1 className="my-5">My Bookings</h1>
 
-      <MDBDataTable data={setBookings()} className="px-3" bordered striped hover />
-    </div>
+        <MemoizedMDBDataTable data={memoizedDataForTable} onPageChange={memoizedCallback} />
+      </div>
+
+      <div ref={invoiceDivRef}></div>
+      {bookingIdToPreviewInvoice && <div style={{ marginTop: 60 }}>{invoiceRef.current}</div>}
+    </>
   );
 }
