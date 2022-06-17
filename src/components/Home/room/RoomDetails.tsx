@@ -16,12 +16,14 @@ import { IBookingDto } from '../../../db/interfaces';
 import { getBookedDates } from '../../../store/ducks/bookings/bookedDates/action';
 import { getRoomBookingAvailability } from '../../../store/ducks/bookings/roomBookingAvailability/action';
 import { RoomFeatures } from './RoomFeatures';
+import getStripe from '../../../utils/getStripe';
 import { getError } from '../../../utils/getAxiosError';
 
 export function RoomDetails(): JSX.Element {
   const [checkInDate, setCheckInDate] = useState<Date | null>(null);
   const [checkOutDate, setCheckOutDate] = useState<Date | null>(null);
   const [daysOfStay, setDaysOfStay] = useState(0);
+  const [paymentLoading, setPaymentLoading] = useState(false);
 
   const router = useRouter();
   const dispatch = useAppDispatch();
@@ -110,6 +112,29 @@ export function RoomDetails(): JSX.Element {
 
       await axios.post<{ status: number; booking: IBookingDto }>('/api/bookings', bookingData, config);
     } catch (error) {
+      const err = getError(error);
+      toast.error(err.errormsg);
+    }
+  };
+
+  const bookRoom = async (id: string | undefined, pricePerNight: number | undefined): Promise<void> => {
+    setPaymentLoading(true);
+
+    const amount = pricePerNight ? pricePerNight * daysOfStay : 0;
+
+    try {
+      const link = `/api/checkout_session/${roomId}?checkInDate${checkInDate?.getTime()}&checkOutDate${checkOutDate?.getTime()}&daysOfStay=${daysOfStay}`;
+
+      const { data } = await axios.get(link, { params: { amount } });
+
+      const stripe = await getStripe();
+
+      // Redirect to checkout
+      stripe.redirectToCheckout({ sessionId: data.id });
+
+      setPaymentLoading(false);
+    } catch (error) {
+      setPaymentLoading(false);
       const err = getError(error);
       toast.error(err.errormsg);
     }
@@ -211,8 +236,10 @@ export function RoomDetails(): JSX.Element {
                   </div>
                   <button
                     className="btn btn-block py-3 booking-btn"
-                    onClick={newBookingHandler}
-                    disabled={!checkOutDate || roomBookingAvailabilityLoading ? true : false}
+                    onClick={(): void => {
+                      bookRoom(room?._id, room?.pricePerNight);
+                    }}
+                    disabled={!checkOutDate || roomBookingAvailabilityLoading || paymentLoading ? true : false}
                   >
                     {daysOfStay && room && `Pay - $${checkOutDate ? daysOfStay * room.pricePerNight : '?'}`}
                   </button>

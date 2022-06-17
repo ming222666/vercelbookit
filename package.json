@@ -10,6 +10,7 @@
   },
   "dependencies": {
     "@react-pdf/renderer": "2.2.0",
+    "@stripe/stripe-js": "1.32.0",
     "axios": "0.26.1",
     "bcryptjs": "2.4.3",
     "cloudinary": "1.29.1",
@@ -33,6 +34,7 @@
     "redux": "^4.2.0",
     "redux-devtools-extension": "^2.13.9",
     "redux-thunk": "^2.4.1",
+    "stripe": "9.8.0",
     "validator": "^13.7.0"
   },
   "devDependencies": {
