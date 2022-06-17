@@ -12,7 +12,6 @@ import 'react-datepicker/dist/react-datepicker.css';
 
 import useAppDispatch from '../../../hooks/useAppDispatch';
 import { AppState } from '../../../store';
-import { IBookingDto } from '../../../db/interfaces';
 import { getBookedDates } from '../../../store/ducks/bookings/bookedDates/action';
 import { getRoomBookingAvailability } from '../../../store/ducks/bookings/roomBookingAvailability/action';
 import { RoomFeatures } from './RoomFeatures';
@@ -34,9 +33,6 @@ export function RoomDetails(): JSX.Element {
   const { isAvailable, loading: roomBookingAvailabilityLoading } = useSelector(
     (state: AppState) => state.bookings.roomBookingAvailability,
   );
-
-  let userId = '';
-  if (user) userId = user._id ? user._id : '';
 
   const roomId = router.query.id as string;
 
@@ -89,33 +85,38 @@ export function RoomDetails(): JSX.Element {
     }
   }, [dispatch, roomId]);
 
-  const newBookingHandler = async (): Promise<void> => {
-    const bookingData: IBookingDto = {
-      room: roomId,
-      user: userId,
-      checkInDate: checkInDate && checkInDate.getTime(),
-      checkOutDate: checkOutDate && checkOutDate.getTime(),
-      daysOfStay,
-      amountPaid: 90,
-      paymentInfo: {
-        id: 'STRIPE_PAYMENT_ID',
-        status: 'STRIPE_PAYMENT_STATUS',
-      },
-    };
-
-    try {
-      const config = {
-        headers: {
-          'Content-Type': 'application/json',
-        },
-      };
-
-      await axios.post<{ status: number; booking: IBookingDto }>('/api/bookings', bookingData, config);
-    } catch (error) {
-      const err = getError(error);
-      toast.error(err.errormsg);
-    }
-  };
+  /**
+   *
+   * newBookingHandler for ref only.
+   */
+  // const newBookingHandler = async (): Promise<void> => {
+  //   // IBookingDto from '../../../db/interfaces'
+  //   const bookingData: IBookingDto = {
+  //     room: roomId,
+  //     user: user && user._id ? user._id : '',
+  //     checkInDate: checkInDate && checkInDate.getTime(),
+  //     checkOutDate: checkOutDate && checkOutDate.getTime(),
+  //     daysOfStay,
+  //     amountPaid: 90,
+  //     paymentInfo: {
+  //       id: 'STRIPE_PAYMENT_ID',
+  //       status: 'STRIPE_PAYMENT_STATUS',
+  //     },
+  //   };
+  //
+  //   try {
+  //     const config = {
+  //       headers: {
+  //         'Content-Type': 'application/json',
+  //       },
+  //     };
+  //
+  //     await axios.post<{ status: number; booking: IBookingDto }>('/api/bookings', bookingData, config);
+  //   } catch (error) {
+  //     const err = getError(error);
+  //     toast.error(err.errormsg);
+  //   }
+  // };
 
   const bookRoom = async (id: string | undefined, pricePerNight: number | undefined): Promise<void> => {
     setPaymentLoading(true);
@@ -123,7 +124,7 @@ export function RoomDetails(): JSX.Element {
     const amount = pricePerNight ? pricePerNight * daysOfStay : 0;
 
     try {
-      const link = `/api/checkout_session/${roomId}?checkInDate${checkInDate?.getTime()}&checkOutDate${checkOutDate?.getTime()}&daysOfStay=${daysOfStay}`;
+      const link = `/api/checkout_session/${roomId}?checkInDate=${checkInDate?.getTime()}&checkOutDate=${checkOutDate?.getTime()}&daysOfStay=${daysOfStay}`;
 
       const { data } = await axios.get(link, { params: { amount } });
 
@@ -131,8 +132,6 @@ export function RoomDetails(): JSX.Element {
 
       // Redirect to checkout
       stripe.redirectToCheckout({ sessionId: data.id });
-
-      setPaymentLoading(false);
     } catch (error) {
       setPaymentLoading(false);
       const err = getError(error);

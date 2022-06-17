@@ -1,21 +1,24 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
 
 import absoluteUrl from 'next-absolute-url';
+import getRawBody from 'raw-body';
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
 
 import db from '../db/db';
-import { IRoomDto, IErrorDto, IAllRoomsDto } from '../db/interfaces';
+import { IErrorDto } from '../db/interfaces';
 import Room from '../db/models/Room';
 import User from '../db/models/User';
 import Booking from '../db/models/Booking';
 
 // Generate stripe checkout session  =>  /api/checkout_session/:roomId
-const stripeCheckoutSession = async (req: NextApiRequest, res: NextApiResponse<IAllRoomsDto>): Promise<void> => {
+const stripeCheckoutSession = async (req: NextApiRequest, res: NextApiResponse): Promise<void> => {
   await db.connect();
 
   // Get room details
   const room = await Room.findById(req.query.roomId);
+
+  await db.disconnect();
 
   const { checkInDate, checkOutDate, daysOfStay } = req.query;
 
@@ -45,4 +48,60 @@ const stripeCheckoutSession = async (req: NextApiRequest, res: NextApiResponse<I
   res.status(200).json(session);
 };
 
-export { stripeCheckoutSession };
+// Create new booking after payment  =>  /api/webhook
+const webhookCheckout = async (
+  req: NextApiRequest,
+  res: NextApiResponse<{ success: boolean } | IErrorDto>,
+): Promise<void> => {
+  const rawBody = await getRawBody(req);
+
+  try {
+    const signature = req.headers['stripe-signature'];
+
+    const event = stripe.webhooks.constructEvent(rawBody, signature, process.env.STRIPE_WEBHOOK_SECRET);
+
+    if (event.type === 'checkout.session.completed') {
+      const session = event.data.object;
+
+      const room = session.client_reference_id;
+      const user = (await User.findOne({ email: session.customer_email })).id;
+
+      const amountPaid = session.amount_total / 100;
+
+      const paymentInfo = {
+        id: session.payment_intent,
+        status: session.payment_status,
+      };
+
+      const checkInDate = session.metadata.checkInDate;
+      const checkOutDate = session.metadata.checkOutDate;
+      const daysOfStay = session.metadata.daysOfStay;
+
+      await db.connect();
+
+      await Booking.create({
+        room,
+        user,
+        checkInDate,
+        checkOutDate,
+        daysOfStay,
+        amountPaid,
+        paymentInfo,
+        paidAt: Date.now(),
+      });
+
+      await db.disconnect();
+      res.status(200).json({
+        success: true,
+      });
+    }
+  } catch (error) {
+    // eslint-disable-next-line no-console
+    console.log('Error in Stripe Checkout Payment => ', error);
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const msg = (error as any).message || 'Error in Stripe Checkout Payment';
+    res.status(500).json({ errormsg: 'Internal Server Error', status: 500, internalServerErrorText: msg });
+  }
+};
+
+export { stripeCheckoutSession, webhookCheckout };

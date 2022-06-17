@@ -3251,7 +3251,7 @@ raf@3.4.1:
   dependencies:
     performance-now "^2.1.0"
 
-raw-body@^2.2.0:
+raw-body@^2.2.0, raw-body@^2.5.1:
   version "2.5.1"
   resolved "https://registry.yarnpkg.com/raw-body/-/raw-body-2.5.1.tgz#fe1b1628b181b700215e5fd42389f98b71392857"
   integrity sha512-qqJBtEyVgS0ZmPGdCFPWJ3FreoqvG4MVQln/kCgF7Olq95IbOp0/BWyMwbdtn4VTvkM8Y7khCQ2Xgk/tcrCXig==
