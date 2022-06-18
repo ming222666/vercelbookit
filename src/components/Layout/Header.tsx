@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useRef } from 'react';
 import { useSelector } from 'react-redux';
 import Link from 'next/link';
 import { signOut } from 'next-auth/react';
@@ -28,6 +28,27 @@ export function Header(): JSX.Element {
     [user],
   );
 
+  const isMounted = useRef(false);
+
+  useEffect((): void => {
+    isMounted.current = true;
+  }, []);
+
+  useEffect(
+    (): void => {
+      async function fetchUser(): Promise<void> {
+        await dispatch(loadUser());
+      }
+      if (isMounted.current) {
+        if (!user && loading) {
+          fetchUser();
+        }
+      }
+    },
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [loading],
+  );
+
   useEffect((): void => {
     if (error) {
       if (error.errormsg !== 'Session not found') {
@@ -48,10 +69,10 @@ export function Header(): JSX.Element {
         <div className="col-3 p-0">
           <div className="navbar-brand">
             {/* eslint-disable-next-line @next/next/no-html-link-for-pages */}
-            <a href="/">
+            <Link href="/">
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img style={{ cursor: 'pointer' }} src="/images/bookit_logo.png" alt="BookIT" />
-            </a>
+            </Link>
           </div>
         </div>
 
