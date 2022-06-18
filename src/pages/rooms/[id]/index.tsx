@@ -1,37 +1,51 @@
 import React from 'react';
-import type { NextPage } from 'next';
-import { ThunkDispatch } from 'redux-thunk';
+import type { NextPage, GetServerSideProps } from 'next';
+
+import axios from 'axios';
+import absoluteUrl from 'next-absolute-url';
 
 import Layout from '../../../components/Layout';
 import { RoomDetails } from '../../../components/Home/room';
-import { wrapper } from '../../../store';
-import { getRoom } from '../../../store/ducks/roomDetails/action';
-import { RoomDetailsAction } from '../../../store/ducks/roomDetails/types';
-import { RoomDetailsState } from '../../../store/ducks/roomDetails/models/RoomDetailsState';
+import { IRoomDto, IErrorDto } from '../../../db/interfaces';
+import { getError } from '../../../utils/getAxiosError';
 
-const RoomDetailsPage: NextPage = () => {
+export interface Props {
+  room: IRoomDto | null;
+  error: IErrorDto | null;
+}
+
+const RoomDetailsPage: NextPage<Props> = (props) => {
   return (
     <Layout>
-      <RoomDetails />
+      <RoomDetails {...props} />
     </Layout>
   );
 };
 
-export const getServerSideProps = wrapper.getServerSideProps(
-  (store) =>
-    async (
-      ctx,
-    ): Promise<{
-      props: object;
-    }> => {
-      await (store.dispatch as ThunkDispatch<RoomDetailsState, undefined, RoomDetailsAction>)(
-        getRoom(ctx.req, ctx.params?.id as string),
-      );
+export const getServerSideProps: GetServerSideProps<Props> = async (ctx) => {
+  const { origin } = absoluteUrl(ctx.req);
 
-      return {
-        props: {},
-      };
-    },
-);
+  const roomId = ctx.params?.id;
+
+  try {
+    const { data } = await axios.get<IRoomDto>(`${origin}/api/rooms/${roomId}`);
+
+    return {
+      props: {
+        room: data,
+        error: null,
+      },
+    };
+  } catch (error) {
+    const err = getError(error);
+
+    return {
+      props: {
+        room: null,
+        error: err,
+      },
+    };
+  }
+};
 
 export default RoomDetailsPage;

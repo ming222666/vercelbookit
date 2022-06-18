@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect } from 'react';
 import { useSelector } from 'react-redux';
 import Link from 'next/link';
 import { signOut } from 'next-auth/react';
@@ -26,27 +26,6 @@ export function Header(): JSX.Element {
     },
     // eslint-disable-next-line react-hooks/exhaustive-deps
     [user],
-  );
-
-  const isMounted = useRef(false);
-
-  useEffect((): void => {
-    isMounted.current = true;
-  }, []);
-
-  useEffect(
-    (): void => {
-      async function fetchUser(): Promise<void> {
-        await dispatch(loadUser());
-      }
-      if (isMounted.current) {
-        if (!user && loading) {
-          fetchUser();
-        }
-      }
-    },
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    [loading],
   );
 
   useEffect((): void => {

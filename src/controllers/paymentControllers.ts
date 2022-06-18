@@ -55,6 +55,8 @@ const webhookCheckout = async (
 ): Promise<void> => {
   const rawBody = await getRawBody(req);
 
+  let isConnect = false;
+
   try {
     const signature = req.headers['stripe-signature'];
 
@@ -62,6 +64,10 @@ const webhookCheckout = async (
 
     if (event.type === 'checkout.session.completed') {
       const session = event.data.object;
+
+      isConnect = true;
+
+      await db.connect();
 
       const room = session.client_reference_id;
       const user = (await User.findOne({ email: session.customer_email })).id;
@@ -77,8 +83,6 @@ const webhookCheckout = async (
       const checkOutDate = session.metadata.checkOutDate;
       const daysOfStay = session.metadata.daysOfStay;
 
-      await db.connect();
-
       await Booking.create({
         room,
         user,
@@ -90,12 +94,16 @@ const webhookCheckout = async (
         paidAt: Date.now(),
       });
 
+      isConnect = false;
+
       await db.disconnect();
       res.status(200).json({
         success: true,
       });
     }
   } catch (error) {
+    if (isConnect) await db.disconnect();
+
     // eslint-disable-next-line no-console
     console.log('Error in Stripe Checkout Payment => ', error);
     // eslint-disable-next-line @typescript-eslint/no-explicit-any

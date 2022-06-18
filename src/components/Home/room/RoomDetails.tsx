@@ -17,8 +17,9 @@ import { getRoomBookingAvailability } from '../../../store/ducks/bookings/roomBo
 import { RoomFeatures } from './RoomFeatures';
 import getStripe from '../../../utils/getStripe';
 import { getError } from '../../../utils/getAxiosError';
+import { Props } from '../../../pages/rooms/[id]/index';
 
-export function RoomDetails(): JSX.Element {
+export function RoomDetails({ room, error }: Props): JSX.Element {
   const [checkInDate, setCheckInDate] = useState<Date | null>(null);
   const [checkOutDate, setCheckOutDate] = useState<Date | null>(null);
   const [daysOfStay, setDaysOfStay] = useState(0);
@@ -29,7 +30,6 @@ export function RoomDetails(): JSX.Element {
 
   const { dates: bookedDates, error: bookedDatesError } = useSelector((state: AppState) => state.bookings.bookedDates);
   const { user } = useSelector((state: AppState) => state.auth);
-  const { room, error } = useSelector((state: AppState) => state.roomDetails);
   const { isAvailable, loading: roomBookingAvailabilityLoading } = useSelector(
     (state: AppState) => state.bookings.roomBookingAvailability,
   );

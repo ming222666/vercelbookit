@@ -1,17 +1,14 @@
 import React, { useEffect } from 'react';
-import { useSelector } from 'react-redux';
 import { useRouter } from 'next/router';
 import Link from 'next/link';
 
 import { toast } from 'react-toastify';
 import Pagination from 'react-js-pagination';
 
-import { AppState } from '../../store';
 import { RoomItem } from './room';
+import { Props } from '../../pages';
 
-export function Home(): JSX.Element {
-  const { rooms, resPerPage, roomsCount, filteredRoomsCount, error } = useSelector((state: AppState) => state.allRooms);
-
+export function Home({ rooms, resPerPage, roomsCount, filteredRoomsCount, error }: Props): JSX.Element {
   useEffect((): void => {
     if (error) {
       toast.error(error.errormsg);
