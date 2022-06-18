@@ -43,7 +43,7 @@ export function Header(): JSX.Element {
   };
 
   return (
-    <nav className="navbar row justify-content-center sticky-top">
+    <nav className="navbar row justify-content-center sticky-top" style={{ minHeight: '4.2rem' }}>
       <div className="container">
         <div className="col-3 p-0">
           <div className="navbar-brand">
