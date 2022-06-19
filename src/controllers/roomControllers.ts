@@ -3,6 +3,7 @@ import type { NextApiRequest, NextApiResponse } from 'next';
 import db from '../db/db';
 import { IRoomDto, IErrorDto, IAllRoomsDto } from '../db/interfaces';
 import Room from '../db/models/Room';
+import Booking from '../db/models/Booking';
 import APIFeatures from '../utils/apiFeatures';
 import { IWithBodyNextApiRequest } from './interfaces';
 
@@ -96,4 +97,68 @@ const deleteRoom = async (req: NextApiRequest, res: NextApiResponse<{ status: nu
   res.status(200).json({ status: 200 });
 };
 
-export { allRooms, newRoom, getSingleRoom, updateRoom, deleteRoom };
+interface IReviewDto {
+  _id?: string;
+  user?: string;
+  name?: string;
+  roomId: string;
+  rating: number;
+  comment: string;
+}
+
+// Create a new room review => /api/reviews
+const createRoomReview = async (req: NextApiRequest, res: NextApiResponse): Promise<void> => {
+  const { rating, comment, roomId } = req.body;
+
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const user = (req as any).user._id;
+
+  const review: IReviewDto = {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    user,
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    name: (req as any).user.name,
+    roomId,
+    rating: Number(rating),
+    comment,
+  };
+
+  await db.connect();
+  const room = await Room.findById(roomId);
+
+  const isReviewed = room.reviews.find((r: IReviewDto) => r.user?.toString() === user);
+
+  if (isReviewed) {
+    room.reviews.forEach((r: IReviewDto) => {
+      if (r.user?.toString() === user) {
+        r.comment = comment;
+        r.rating = rating;
+      }
+    });
+  } else {
+    room.reviews.push(review);
+    room.numOfReviews = room.reviews.length;
+  }
+
+  room.ratings = room.reviews.reduce((acc: number, r: IReviewDto) => r.rating + acc, 0) / room.reviews.length;
+
+  await room.save({ validateBeforeSafe: false });
+
+  await db.disconnect();
+  res.status(200).send({});
+};
+
+// Check Review Availability   =>   /api/reviews/check_review_availability
+const checkReviewAvailability = async (req: NextApiRequest, res: NextApiResponse<boolean>): Promise<void> => {
+  const { roomId } = req.query;
+
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const bookings = await Booking.find({ user: (req as any).user._id, room: roomId });
+
+  let isReviewAvailable = false;
+  if (bookings.length > 0) isReviewAvailable = true;
+
+  res.status(200).send(isReviewAvailable);
+};
+
+export { allRooms, newRoom, getSingleRoom, updateRoom, deleteRoom, createRoomReview, checkReviewAvailability };

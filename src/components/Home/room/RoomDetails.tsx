@@ -15,6 +15,7 @@ import { AppState } from '../../../store';
 import { getBookedDates } from '../../../store/ducks/bookings/bookedDates/action';
 import { getRoomBookingAvailability } from '../../../store/ducks/bookings/roomBookingAvailability/action';
 import { RoomFeatures } from './RoomFeatures';
+import { NewReview } from '../../review/NewReview';
 import getStripe from '../../../utils/getStripe';
 import { getError } from '../../../utils/getAxiosError';
 import { Props } from '../../../pages/rooms/[id]/index';
@@ -247,6 +248,8 @@ export function RoomDetails({ room, error }: Props): JSX.Element {
             </div>
           </div>
         </div>
+
+        <NewReview />
 
         <div className="reviews w-75">
           <h3>Reviews:</h3>

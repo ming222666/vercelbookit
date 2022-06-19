@@ -24,6 +24,10 @@ export async function onError(err: any, req: any, res: NextApiResponse<IErrorDto
   } else if (errName === 'ValidationError') {
     const firstValidationError = err.errors[Object.keys(err.errors)[0]].message;
     errormsg = firstValidationError;
+    if (errormsg.substring(0, 5) === 'Path ') {
+      // e.g. "Path `comment` is required" => remove leading "Path " becomes "`comment` is required"
+      errormsg = firstValidationError.substring(5);
+    }
   } else if (errName === 'MongoServerError') {
     if (err.code === 11000) {
       const keyValue = err.keyValue; // e.g. { email: 'existingEmail@xxx.com' }

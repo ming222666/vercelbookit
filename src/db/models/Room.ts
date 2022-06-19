@@ -82,7 +82,7 @@ const roomSchema = new mongoose.Schema({
       user: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: false }, // required: true
       name: { type: String, required: true },
       rating: { type: Number, required: true },
-      comment: { type: String, required: true },
+      comment: { type: String, required: true, trim: true },
     },
   ],
   user: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: false }, // required: true
