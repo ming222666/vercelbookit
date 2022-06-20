@@ -21,7 +21,11 @@ export function Header(): JSX.Element {
       }
 
       if (!user) {
-        fetchUser();
+        // fetchUser();
+        const t = setTimeout(() => {
+          fetchUser();
+          clearTimeout(t);
+        }, 200);
       }
     },
     // eslint-disable-next-line react-hooks/exhaustive-deps
