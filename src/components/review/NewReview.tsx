@@ -4,9 +4,11 @@ import { useSelector } from 'react-redux';
 
 import { toast } from 'react-toastify';
 
-import { checkReviewAvailability } from '../../store/ducks/reviewAvailablility/action';
+import { checkReviewAvailability } from '../../store/ducks/reviewAvailability/action';
 import { newReview } from '../../store/ducks/reviewNew/action';
+import { ReviewAvailabilityActionType } from '../../store/ducks/reviewAvailability/types';
 import { NewReviewActionType } from '../../store/ducks/reviewNew/types';
+import { AuthActionType } from '../../store/ducks/auth/types';
 
 import useAppDispatch from '../../hooks/useAppDispatch';
 import { AppState } from '../../store';
@@ -19,7 +21,8 @@ export function NewReview(): JSX.Element {
   const dispatch = useAppDispatch();
 
   const { error, success } = useSelector((state: AppState) => state.reviewNew);
-  const { isAvailable } = useSelector((state: AppState) => state.reviewAvailablility);
+  const { isAvailable, error: reviewAvailabilityError } = useSelector((state: AppState) => state.reviewAvailability);
+  const { user } = useSelector((state: AppState) => state.auth);
 
   const { id } = router.query;
 
@@ -31,6 +34,16 @@ export function NewReview(): JSX.Element {
   }, []);
 
   useEffect(() => {
+    if (reviewAvailabilityError) {
+      if (reviewAvailabilityError.errormsg !== 'Session not found') {
+        toast.error(reviewAvailabilityError.errormsg);
+        dispatch({ type: ReviewAvailabilityActionType.REVIEW_AVAILABLILITY_RESET_FAIL });
+      }
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [reviewAvailabilityError]);
+
+  useEffect(() => {
     if (success) {
       toast.success('Review is posted.');
       dispatch({ type: NewReviewActionType.NEW_REVIEW_RESET_SUCCESS });
@@ -39,6 +52,12 @@ export function NewReview(): JSX.Element {
 
   useEffect(() => {
     if (error) {
+      if (error.errormsg === 'Session not found') {
+        toast.error('You must be logined to perform this action');
+        dispatch({ type: NewReviewActionType.NEW_REVIEW_RESET_FAIL });
+        dispatch({ type: AuthActionType.RESET_USER });
+        return;
+      }
       toast.error(error.errormsg);
       dispatch({ type: NewReviewActionType.NEW_REVIEW_RESET_FAIL });
     }
@@ -101,7 +120,7 @@ export function NewReview(): JSX.Element {
 
   return (
     <>
-      {isAvailable && (
+      {user && isAvailable && (
         <button
           id="review_btn"
           type="button"

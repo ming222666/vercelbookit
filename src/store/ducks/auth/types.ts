@@ -5,6 +5,7 @@ export enum AuthActionType {
   LOAD_USER_REQUEST = 'auth/LOAD_USER_REQUEST',
   LOAD_USER_FAIL = 'auth/LOAD_USER_FAIL',
   LOAD_USER_SUCCESS = 'auth/LOAD_USER_SUCCESS',
+  RESET_USER = 'auth/RESET_USER',
 }
 
 export interface LoadUserRequestAction extends BaseAction {
@@ -21,4 +22,8 @@ export interface LoadUserSuccessAction extends BaseAction {
   payload: IUserDto;
 }
 
-export type AuthAction = LoadUserRequestAction | LoadUserFailAction | LoadUserSuccessAction;
+export interface ClearUserAction extends BaseAction {
+  type: AuthActionType.RESET_USER;
+}
+
+export type AuthAction = LoadUserRequestAction | LoadUserFailAction | LoadUserSuccessAction | ClearUserAction;

@@ -1,5 +1,5 @@
 import { ILES } from '../../../../db/interfaces';
 
-export interface ReviewAvailablilityState extends ILES {
+export interface ReviewAvailabilityState extends ILES {
   isAvailable: boolean;
 }

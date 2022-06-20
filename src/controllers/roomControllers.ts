@@ -140,7 +140,7 @@ const createRoomReview = async (req: NextApiRequest, res: NextApiResponse): Prom
     room.numOfReviews = room.reviews.length;
   }
 
-  room.ratings = room.reviews.reduce((acc: number, r: IReviewDto) => r.rating + acc, 0) / room.reviews.length;
+  room.rating = room.reviews.reduce((acc: number, r: IReviewDto) => r.rating + acc, 0) / room.reviews.length;
 
   await room.save({ validateBeforeSafe: false });
 
@@ -152,8 +152,12 @@ const createRoomReview = async (req: NextApiRequest, res: NextApiResponse): Prom
 const checkReviewAvailability = async (req: NextApiRequest, res: NextApiResponse<boolean>): Promise<void> => {
   const { roomId } = req.query;
 
+  await db.connect();
+
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const bookings = await Booking.find({ user: (req as any).user._id, room: roomId });
+
+  await db.disconnect();
 
   let isReviewAvailable = false;
   if (bookings.length > 0) isReviewAvailable = true;
