@@ -1,15 +1,27 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { useRouter } from 'next/router';
 import Link from 'next/link';
 import { signIn } from 'next-auth/react';
+import { useSelector } from 'react-redux';
 
 import { toast } from 'react-toastify';
 
 import ButtonLoader from '../Layout/ButtonLoader';
+import { AppState } from '../../store';
 
 export default function Login(): JSX.Element {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
+
+  const router = useRouter();
+  const { redirect } = router.query;
+
+  const { user } = useSelector((state: AppState) => state.auth);
+
+  useEffect((): void => {
+    if (user) router.push('/');
+  }, [router, user]);
 
   const submitHandler = async (e: React.SyntheticEvent<Element, Event>): Promise<void> => {
     e.preventDefault();
@@ -27,7 +39,7 @@ export default function Login(): JSX.Element {
       setLoading(false);
       toast.error(result.error);
     } else {
-      window.location.href = '/';
+      redirect ? (window.location.href = redirect as string) : (window.location.href = '/ ');
     }
   };
 

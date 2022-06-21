@@ -74,25 +74,20 @@ export function Header(): JSX.Element {
 
     function onReveal(): void {
       if (!document.hidden) {
-        // eslint-disable-next-line no-console
-        console.log('tabbbb comes to view');
-
         axios
           .get<string>('/api/isAuth')
           // eslint-disable-next-line no-console
           .then((res: AxiosResponse) => {
-            console.log('userIduserIduserIduserId axios', res.data);
-            console.log('userIduserIduserIduserId state', userRef.current);
-
             if (res.data !== userRef.current?._id) {
               window.location.href = window.location.href;
             }
           })
           .catch((error) => {
             const err = getError(error);
-            toast.error(err.errormsg + ' tab chg');
-            // console.log('tab chg user', user);
-            console.log('tab chg user userqRef.current', userRef.current);
+
+            if (err.errormsg !== 'Session not found') {
+              toast.error(err.errormsg);
+            }
             if (userRef.current) {
               window.location.href = window.location.href;
             }
