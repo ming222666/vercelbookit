@@ -1,21 +1,27 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useRef } from 'react';
 import { useSelector } from 'react-redux';
 import Link from 'next/link';
 import { signOut } from 'next-auth/react';
 
+import axios, { AxiosResponse } from 'axios';
 import { toast } from 'react-toastify';
 
 import useAppDispatch from '../../hooks/useAppDispatch';
 import { AppState } from '../../store';
 import { loadUser } from '../../store/ducks/auth/action';
+import { getError } from '../../utils/getAxiosError';
 
 export function Header(): JSX.Element {
   // https://stackoverflow.com/questions/59800913/type-safe-usedispatch-with-redux-thunk
   const dispatch = useAppDispatch();
   const { user, error, loading } = useSelector((state: AppState) => state.auth);
 
+  const userRef = useRef(user);
+
   useEffect(
     (): void => {
+      userRef.current = user;
+
       async function fetchUser(): Promise<void> {
         await dispatch(loadUser());
       }
@@ -39,6 +45,69 @@ export function Header(): JSX.Element {
       }
     }
   }, [error]);
+
+  useEffect((): (() => void) => {
+    // https://stackoverflow.com/questions/52744866/react-js-ability-to-detect-switching-tab-in-browser
+    /* eslint-disable @typescript-eslint/no-explicit-any */
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    const hidden =
+      typeof window === 'undefined'
+        ? null
+        : typeof document.hidden !== 'undefined'
+        ? 'hidden'
+        : typeof (document as any).msHidden !== 'undefined'
+        ? 'msHidden'
+        : typeof (document as any).webkitHidden !== 'undefined'
+        ? 'webkitHidden'
+        : null;
+
+    const visibilityChange =
+      typeof window === 'undefined'
+        ? null
+        : typeof document.hidden !== 'undefined'
+        ? 'visibilitychange'
+        : typeof (document as any).msHidden !== 'undefined'
+        ? 'msvisibilitychange'
+        : typeof (document as any).webkitHidden !== 'undefined'
+        ? 'webkitvisibilitychange'
+        : null;
+
+    function onReveal(): void {
+      if (!document.hidden) {
+        // eslint-disable-next-line no-console
+        console.log('tabbbb comes to view');
+
+        axios
+          .get<string>('/api/isAuth')
+          // eslint-disable-next-line no-console
+          .then((res: AxiosResponse) => {
+            console.log('userIduserIduserIduserId axios', res.data);
+            console.log('userIduserIduserIduserId state', userRef.current);
+
+            if (res.data !== userRef.current?._id) {
+              window.location.href = window.location.href;
+            }
+          })
+          .catch((error) => {
+            const err = getError(error);
+            toast.error(err.errormsg + ' tab chg');
+            // console.log('tab chg user', user);
+            console.log('tab chg user userqRef.current', userRef.current);
+            if (userRef.current) {
+              window.location.href = window.location.href;
+            }
+          });
+      }
+    }
+
+    document.addEventListener(visibilityChange as any, onReveal, false);
+
+    return function (): void {
+      document.removeEventListener(visibilityChange as any, onReveal);
+    };
+    /* eslint-enable @typescript-eslint/no-explicit-any */
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const logoutHandler = (): void => {
     signOut({
