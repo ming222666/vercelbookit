@@ -1,13 +1,12 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState /* , useEffect, useRef */ } from 'react';
 import { useRouter } from 'next/router';
-import Link from 'next/link';
 import { signIn } from 'next-auth/react';
-import { useSelector } from 'react-redux';
+import Link from 'next/link';
 
 import { toast } from 'react-toastify';
 
 import ButtonLoader from '../Layout/ButtonLoader';
-import { AppState } from '../../store';
+import useRedirectIfAuthenticated from '../../hooks/useRedirectIfAuthenticated';
 
 export default function Login(): JSX.Element {
   const [email, setEmail] = useState('');
@@ -17,11 +16,7 @@ export default function Login(): JSX.Element {
   const router = useRouter();
   const { redirect } = router.query;
 
-  const { user } = useSelector((state: AppState) => state.auth);
-
-  useEffect((): void => {
-    if (user) router.push('/');
-  }, [router, user]);
+  const redirectIfAuthenticated = useRedirectIfAuthenticated();
 
   const submitHandler = async (e: React.SyntheticEvent<Element, Event>): Promise<void> => {
     e.preventDefault();
@@ -75,7 +70,12 @@ export default function Login(): JSX.Element {
               <a className="float-right mb-4">Forgot Password?</a>
             </Link>
 
-            <button id="login_button" type="submit" className="btn btn-block py-3" disabled={loading}>
+            <button
+              id="login_button"
+              type="submit"
+              className="btn btn-block py-3"
+              disabled={loading || redirectIfAuthenticated}
+            >
               {loading ? <ButtonLoader /> : 'LOGIN'}
             </button>
 
