@@ -1,6 +1,6 @@
 import React from 'react';
-import type { NextPage, GetServerSideProps } from 'next';
-import { getSession } from 'next-auth/react';
+import type { NextPage } from 'next';
+import dynamic from 'next/dynamic';
 
 import Layout from '../components/Layout';
 import Register from '../components/auth/Register';
@@ -13,21 +13,4 @@ const RegisterPage: NextPage = () => {
   );
 };
 
-export const getServerSideProps: GetServerSideProps = async (context) => {
-  const session = await getSession({ req: context.req });
-
-  if (session) {
-    return {
-      redirect: {
-        destination: '/',
-        permanent: false,
-      },
-    };
-  }
-
-  return {
-    props: {},
-  };
-};
-
-export default RegisterPage;
+export default dynamic(() => Promise.resolve(RegisterPage), { ssr: false });
