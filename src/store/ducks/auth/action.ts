@@ -71,20 +71,20 @@ export const updateUser =
   async (dispatch: ThunkDispatch<AuthState, undefined, AuthAction>): Promise<AuthAction> => {
     try {
       dispatch({
-        type: AuthActionType.LOAD_USER_REQUEST,
+        type: AuthActionType.UPDATE_USER_REQUEST,
       });
 
       const { data } = await axios.put<IUserDto>('/api/me/update', userData, config);
 
       return dispatch({
-        type: AuthActionType.LOAD_USER_SUCCESS,
+        type: AuthActionType.UPDATE_USER_SUCCESS,
         payload: data,
       });
     } catch (error) {
       const err = getError(error);
 
       return dispatch({
-        type: AuthActionType.LOAD_USER_FAIL,
+        type: AuthActionType.UPDATE_USER_FAIL,
         payload: err,
       });
     }

@@ -1,15 +1,17 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useSelector } from 'react-redux';
 
 import { toast } from 'react-toastify';
 
 import ButtonLoader from '../Layout/ButtonLoader';
+import useRedirectToLoginIfNotAuthenticated from '../../hooks/useRedirectToLoginIfNotAuthenticated';
 import useAppDispatch from '../../hooks/useAppDispatch';
 import { AppState } from '../../store';
 import { updateUser } from '../../store/ducks/auth/action';
+import { AuthActionType } from '../../store/ducks/auth/types';
 
 export default function UpdateProfile(): JSX.Element {
-  const { user: userFromState, error, success, loading } = useSelector((state: AppState) => state.auth);
+  const { user: userFromState, loading, userUpdate } = useSelector((state: AppState) => state.auth);
 
   const [user, setUser] = useState<{ name: string; email: string; password: string }>({
     name: userFromState ? userFromState.name : '',
@@ -24,7 +26,7 @@ export default function UpdateProfile(): JSX.Element {
 
   const dispatch = useAppDispatch();
 
-  const isSubmittedUpdate = useRef(false);
+  const redirectToLoginIfNotAuthenticated = useRedirectToLoginIfNotAuthenticated();
 
   useEffect(() => {
     if (userFromState) {
@@ -36,18 +38,22 @@ export default function UpdateProfile(): JSX.Element {
       });
       userFromState.avatar?.url && setAvatarPreview(userFromState.avatar.url);
     }
-
-    if (isSubmittedUpdate.current) {
-      isSubmittedUpdate.current = false;
-      if (success) toast.success('Profile successfully updated');
-      if (error) toast.error(`Update Error: ${error.errormsg}`);
-    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [userFromState]);
 
+  useEffect(() => {
+    if (userUpdate.success) {
+      dispatch({ type: AuthActionType.UPDATE_USER_RESET_SUCCESS });
+      toast.success('Profile successfully updated');
+    }
+    if (userUpdate.error) {
+      dispatch({ type: AuthActionType.UPDATE_USER_RESET_FAIL });
+      toast.error(`Update Error: ${userUpdate.error.errormsg}`);
+    }
+  }, [dispatch, userUpdate]);
+
   const submitHandler = async (e: React.SyntheticEvent<Element, Event>): Promise<void> => {
     e.preventDefault();
-    isSubmittedUpdate.current = true;
     const userData = { ...user, avatar };
     dispatch(updateUser(userData));
   };
@@ -139,8 +145,13 @@ export default function UpdateProfile(): JSX.Element {
               </div>
             </div>
 
-            <button id="login_button" type="submit" className="btn btn-block py-3" disabled={loading}>
-              {loading ? <ButtonLoader /> : 'UPDATE'}
+            <button
+              id="login_button"
+              type="submit"
+              className="btn btn-block py-3"
+              disabled={loading || userUpdate.loading || redirectToLoginIfNotAuthenticated}
+            >
+              {loading || userUpdate.loading || redirectToLoginIfNotAuthenticated ? <ButtonLoader /> : 'UPDATE'}
             </button>
           </form>
         </div>

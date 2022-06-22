@@ -6,6 +6,12 @@ export enum AuthActionType {
   LOAD_USER_FAIL = 'auth/LOAD_USER_FAIL',
   LOAD_USER_SUCCESS = 'auth/LOAD_USER_SUCCESS',
   RESET_USER = 'auth/RESET_USER',
+
+  UPDATE_USER_REQUEST = 'auth/UPDATE_USER_REQUEST',
+  UPDATE_USER_FAIL = 'auth/UPDATE_USER_FAIL',
+  UPDATE_USER_SUCCESS = 'auth/UPDATE_USER_SUCCESS',
+  UPDATE_USER_RESET_FAIL = 'auth/UPDATE_USER_RESET_FAIL',
+  UPDATE_USER_RESET_SUCCESS = 'auth/UPDATE_USER_RESET_SUCCESS',
 }
 
 export interface LoadUserRequestAction extends BaseAction {
@@ -23,7 +29,38 @@ export interface LoadUserSuccessAction extends BaseAction {
 }
 
 export interface ClearUserAction extends BaseAction {
-  type: AuthActionType.RESET_USER;
+  type: AuthActionType.RESET_USER; // todo rm cos settled by listening browser tab chg
 }
 
-export type AuthAction = LoadUserRequestAction | LoadUserFailAction | LoadUserSuccessAction | ClearUserAction;
+export interface UpdateUserRequestAction extends BaseAction {
+  type: AuthActionType.UPDATE_USER_REQUEST;
+}
+
+export interface UpdateUserFailAction extends BaseAction {
+  type: AuthActionType.UPDATE_USER_FAIL;
+  payload: IErrorDto;
+}
+
+export interface UpdateUserSuccessAction extends BaseAction {
+  type: AuthActionType.UPDATE_USER_SUCCESS;
+  payload: IUserDto;
+}
+
+export interface UpdateUserResetFailAction extends BaseAction {
+  type: AuthActionType.UPDATE_USER_RESET_FAIL;
+}
+
+export interface UpdateUserResetSuccessAction extends BaseAction {
+  type: AuthActionType.UPDATE_USER_RESET_SUCCESS;
+}
+
+export type AuthAction =
+  | LoadUserRequestAction
+  | LoadUserFailAction
+  | LoadUserSuccessAction
+  | ClearUserAction
+  | UpdateUserRequestAction
+  | UpdateUserFailAction
+  | UpdateUserSuccessAction
+  | UpdateUserResetFailAction
+  | UpdateUserResetSuccessAction;

@@ -11,6 +11,7 @@ const initialState: AuthState = {
    */
   loading: true,
   success: null,
+  userUpdate: { error: null, loading: false, success: null },
 };
 
 const authReducer = (state: AuthState = initialState, action: AuthAction): AuthState => {
@@ -39,6 +40,60 @@ const authReducer = (state: AuthState = initialState, action: AuthAction): AuthS
       };
     case AuthActionType.RESET_USER:
       return { ...initialState, loading: false };
+
+    case AuthActionType.UPDATE_USER_REQUEST:
+      return {
+        ...state,
+        userUpdate: {
+          ...state.userUpdate,
+          error: null,
+          loading: true,
+          success: null,
+        },
+      };
+    case AuthActionType.UPDATE_USER_FAIL:
+      return {
+        ...state,
+        userUpdate: {
+          ...state.userUpdate,
+          error: action.payload,
+          loading: false,
+          success: null,
+        },
+      };
+    case AuthActionType.UPDATE_USER_SUCCESS:
+      return {
+        ...state,
+        user: action.payload,
+        userUpdate: {
+          ...state.userUpdate,
+          error: null,
+          loading: false,
+          success: true,
+        },
+      };
+    case AuthActionType.UPDATE_USER_RESET_FAIL:
+      return {
+        ...state,
+        userUpdate: {
+          ...state.userUpdate,
+          error: null,
+          loading: false,
+          success: null,
+        },
+      };
+    case AuthActionType.UPDATE_USER_RESET_SUCCESS:
+      return {
+        ...state,
+        user: action.payload,
+        userUpdate: {
+          ...state.userUpdate,
+          error: null,
+          loading: false,
+          success: null,
+        },
+      };
+
     default:
       return state;
   }
