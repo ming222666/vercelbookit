@@ -37,6 +37,7 @@ export interface IRoomDto {
   category: string;
   reviews: [
     {
+      _id?: string;
       user: string;
       name: string;
       rating: number;

@@ -19,6 +19,7 @@ import { NewReview } from '../../review/NewReview';
 import getStripe from '../../../utils/getStripe';
 import { getError } from '../../../utils/getAxiosError';
 import { Props } from '../../../pages/rooms/[id]/index';
+import { ListReviews } from '../../review/ListReviews';
 
 export function RoomDetails({ room, error }: Props): JSX.Element {
   const [checkInDate, setCheckInDate] = useState<Date | null>(null);
@@ -251,29 +252,13 @@ export function RoomDetails({ room, error }: Props): JSX.Element {
 
         <NewReview />
 
-        <div className="reviews w-75">
-          <h3>Reviews:</h3>
-          <hr />
-          <div className="review-card my-3">
-            <div className="rating-outer">
-              <div className="rating-inner"></div>
-            </div>
-            <p className="review_user">by John</p>
-            <p className="review_comment">Good Quality</p>
-
-            <hr />
-          </div>
-
-          <div className="review-card my-3">
-            <div className="rating-outer">
-              <div className="rating-inner"></div>
-            </div>
-            <p className="review_user">by John</p>
-            <p className="review_comment">Good Quality</p>
-
-            <hr />
-          </div>
-        </div>
+        {room?.reviews && room.reviews.length > 0 ? (
+          <ListReviews reviews={room.reviews} />
+        ) : (
+          <p>
+            <b>No reviews on this room</b>
+          </p>
+        )}
       </div>
     </>
   );
