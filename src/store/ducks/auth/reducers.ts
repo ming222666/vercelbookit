@@ -38,9 +38,6 @@ const authReducer = (state: AuthState = initialState, action: AuthAction): AuthS
         loading: false,
         success: true,
       };
-    case AuthActionType.RESET_USER:
-      return { ...initialState, loading: false };
-
     case AuthActionType.UPDATE_USER_REQUEST:
       return {
         ...state,

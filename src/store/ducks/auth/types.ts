@@ -5,7 +5,6 @@ export enum AuthActionType {
   LOAD_USER_REQUEST = 'auth/LOAD_USER_REQUEST',
   LOAD_USER_FAIL = 'auth/LOAD_USER_FAIL',
   LOAD_USER_SUCCESS = 'auth/LOAD_USER_SUCCESS',
-  RESET_USER = 'auth/RESET_USER',
 
   UPDATE_USER_REQUEST = 'auth/UPDATE_USER_REQUEST',
   UPDATE_USER_FAIL = 'auth/UPDATE_USER_FAIL',
@@ -26,10 +25,6 @@ export interface LoadUserFailAction extends BaseAction {
 export interface LoadUserSuccessAction extends BaseAction {
   type: AuthActionType.LOAD_USER_SUCCESS;
   payload: IUserDto;
-}
-
-export interface ClearUserAction extends BaseAction {
-  type: AuthActionType.RESET_USER; // todo rm cos settled by listening browser tab chg
 }
 
 export interface UpdateUserRequestAction extends BaseAction {
@@ -58,7 +53,6 @@ export type AuthAction =
   | LoadUserRequestAction
   | LoadUserFailAction
   | LoadUserSuccessAction
-  | ClearUserAction
   | UpdateUserRequestAction
   | UpdateUserFailAction
   | UpdateUserSuccessAction
