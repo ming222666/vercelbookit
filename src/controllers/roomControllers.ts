@@ -5,6 +5,7 @@ import { IRoomDto, IErrorDto, IAllRoomsDto } from '../db/interfaces';
 import Room from '../db/models/Room';
 import Booking from '../db/models/Booking';
 import APIFeatures from '../utils/apiFeatures';
+import convertDocsToObj from '../utils/convertDocsToObj';
 import { IWithBodyNextApiRequest } from './interfaces';
 
 type RoomNextApiRequest = IWithBodyNextApiRequest<IRoomDto>;
@@ -165,4 +166,29 @@ const checkReviewAvailability = async (req: NextApiRequest, res: NextApiResponse
   res.status(200).send(isReviewAvailable);
 };
 
-export { allRooms, newRoom, getSingleRoom, updateRoom, deleteRoom, createRoomReview, checkReviewAvailability };
+// Get all rooms - ADMIN   =>   /api/admin/rooms
+const allAdminRooms = async (
+  req: NextApiRequest,
+  res: NextApiResponse<{ success: boolean; rooms: IRoomDto[] }>,
+): Promise<void> => {
+  await db.connect();
+  const rooms: IRoomDto[] = await Room.find().lean();
+  convertDocsToObj(rooms);
+  await db.disconnect();
+
+  res.status(200).json({
+    success: true,
+    rooms,
+  });
+};
+
+export {
+  allRooms,
+  newRoom,
+  getSingleRoom,
+  updateRoom,
+  deleteRoom,
+  createRoomReview,
+  checkReviewAvailability,
+  allAdminRooms,
+};
