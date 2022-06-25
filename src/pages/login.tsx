@@ -1,6 +1,6 @@
 import React from 'react';
-import type { NextPage } from 'next';
-import dynamic from 'next/dynamic';
+import type { NextPage, GetServerSideProps } from 'next';
+import { getSession } from 'next-auth/react';
 
 import Layout from '../components/Layout';
 import Login from '../components/auth/Login';
@@ -13,4 +13,21 @@ const LoginPage: NextPage = () => {
   );
 };
 
-export default dynamic(() => Promise.resolve(LoginPage), { ssr: false });
+export const getServerSideProps: GetServerSideProps = async (context) => {
+  const session = await getSession({ req: context.req });
+
+  if (session) {
+    return {
+      redirect: {
+        destination: '/',
+        permanent: false,
+      },
+    };
+  }
+
+  return {
+    props: {},
+  };
+};
+
+export default LoginPage;
