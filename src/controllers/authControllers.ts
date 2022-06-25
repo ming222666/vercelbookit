@@ -119,6 +119,9 @@ const updateProfile = async (req: UserNextApiRequest, res: NextApiResponse<IUser
     };
   }
 
+  // keep up updatedAt
+  user.updatedAt = Date.now();
+
   await user.save();
 
   await db.disconnect();

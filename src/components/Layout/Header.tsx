@@ -3,7 +3,7 @@ import { useSelector } from 'react-redux';
 import Link from 'next/link';
 import { signOut } from 'next-auth/react';
 
-import axios, { AxiosResponse } from 'axios';
+import axios from 'axios';
 import { toast } from 'react-toastify';
 
 import useAppDispatch from '../../hooks/useAppDispatch';
@@ -75,11 +75,17 @@ export function Header(): JSX.Element {
     function onReveal(): void {
       if (!document.hidden) {
         axios
-          .get<string>('/api/isAuth')
-          // eslint-disable-next-line no-console
-          .then((res: AxiosResponse) => {
-            if (res.data !== userRef.current?._id) {
+          .get<{ _id: string; updatedAt: number }>('/api/isAuth')
+          .then((res) => {
+            // user logout and re-logined as different user in another tab
+            if (res.data._id !== userRef.current?._id) {
               window.location.href = window.location.href;
+              return;
+            }
+            // user changed profile in another tab
+            if (res.data.updatedAt !== userRef.current?.updatedAt) {
+              window.location.href = window.location.href;
+              return;
             }
           })
           .catch((error) => {
@@ -88,6 +94,7 @@ export function Header(): JSX.Element {
             if (err.errormsg !== 'Session not found') {
               toast.error(err.errormsg);
             }
+            // user logout in another tab
             if (userRef.current) {
               window.location.href = window.location.href;
             }
