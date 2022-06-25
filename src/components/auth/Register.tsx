@@ -5,7 +5,6 @@ import axios from 'axios';
 import { toast } from 'react-toastify';
 
 import ButtonLoader from '../Layout/ButtonLoader';
-import useRedirectIfAuthenticated from '../../hooks/useRedirectIfAuthenticated';
 import { IUserFormData } from '../../controllers/interfaces';
 import { IErrorDto } from '../../db/interfaces';
 import { getError } from '../../utils/getAxiosError';
@@ -21,8 +20,6 @@ export default function Register(): JSX.Element {
   const [avatarPreview, setAvatarPreview] = useState('/images/default_avatar.jpg');
 
   const [loading, setLoading] = useState(false);
-
-  const redirectIfAuthenticated = useRedirectIfAuthenticated();
 
   const signInUser = async (
     email: string,
@@ -173,12 +170,7 @@ export default function Register(): JSX.Element {
               </div>
             </div>
 
-            <button
-              id="login_button"
-              type="submit"
-              className="btn btn-block py-3"
-              disabled={loading || redirectIfAuthenticated}
-            >
+            <button id="login_button" type="submit" className="btn btn-block py-3" disabled={loading}>
               {loading ? <ButtonLoader /> : 'REGISTER'}
             </button>
           </form>
