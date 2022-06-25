@@ -53,6 +53,7 @@ export type AuthAction =
   | LoadUserRequestAction
   | LoadUserFailAction
   | LoadUserSuccessAction
+  // | LoadUserResetLoadingAction
   | UpdateUserRequestAction
   | UpdateUserFailAction
   | UpdateUserSuccessAction

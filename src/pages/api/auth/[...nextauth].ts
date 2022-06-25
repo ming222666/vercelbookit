@@ -9,6 +9,19 @@ export default NextAuth({
   session: {
     strategy: 'jwt',
   },
+  // https://stackoverflow.com/questions/65737233/next-auth-next-js
+  // https://next-auth.js.org/configuration/options#cookies
+  cookies: {
+    sessionToken: {
+      name: 'next-auth.session-token',
+      options: {
+        httpOnly: false,
+        sameSite: 'lax',
+        path: '/',
+        secure: false,
+      },
+    },
+  },
   providers: [
     CredentialsProvider({
       // The name to display on the sign in form (e.g. 'Sign in with...')

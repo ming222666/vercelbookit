@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { useSelector } from 'react-redux';
 import Link from 'next/link';
 import { signOut } from 'next-auth/react';
@@ -9,9 +9,12 @@ import { toast } from 'react-toastify';
 import useAppDispatch from '../../hooks/useAppDispatch';
 import { AppState } from '../../store';
 import { loadUser } from '../../store/ducks/auth/action';
-import { getError } from '../../utils/getAxiosError';
+import { AuthActionType } from '../../store/ducks/auth/types';
+// import { getError } from '../../utils/getAxiosError';
 
 export function Header(): JSX.Element {
+  const [loadingIsAuth, setLoadingIsAuth] = useState(false);
+
   // https://stackoverflow.com/questions/59800913/type-safe-usedispatch-with-redux-thunk
   const dispatch = useAppDispatch();
   const { user, error, loading } = useSelector((state: AppState) => state.auth);
@@ -27,11 +30,28 @@ export function Header(): JSX.Element {
       }
 
       if (!user) {
-        // fetchUser();
-        const t = setTimeout(() => {
-          fetchUser();
-          clearTimeout(t);
-        }, 200);
+        // eslint-disable-next-line @typescript-eslint/no-var-requires
+        const sessionCookie = require('js-cookie').get('next-auth.session-token');
+
+        if (sessionCookie) {
+          // fetchUser();
+          const t = setTimeout(() => {
+            fetchUser();
+            clearTimeout(t);
+          }, 200);
+        } else {
+          if (loading) {
+            // 1. reset loading flag. Cf remark @ ducks/auth/reducers.ts at AuthState initialState.
+            // 2. signify that user verified is not logined
+            dispatch({
+              type: AuthActionType.LOAD_USER_FAIL,
+              payload: {
+                errormsg: 'Session not found',
+                status: 401,
+              },
+            });
+          }
+        }
       }
     },
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -74,6 +94,7 @@ export function Header(): JSX.Element {
 
     function onReveal(): void {
       if (!document.hidden) {
+        setLoadingIsAuth(true);
         axios
           .get<{ _id: string; updatedAt: number }>('/api/isAuth')
           .then((res) => {
@@ -87,17 +108,24 @@ export function Header(): JSX.Element {
               window.location.href = window.location.href;
               return;
             }
+            setLoadingIsAuth(false);
           })
-          .catch((error) => {
-            const err = getError(error);
+          .catch(() => {
+            // .catch((error) => {
+            // const err = getError(error);
+            //
+            // if (err.errormsg !== 'Session not found') {
+            //   setLoadingIsAuth(false);
+            //   toast.error(err.errormsg);
+            // }
 
-            if (err.errormsg !== 'Session not found') {
-              toast.error(err.errormsg);
-            }
             // user logout in another tab
             if (userRef.current) {
               window.location.href = window.location.href;
+              return;
             }
+            // user not logined
+            setLoadingIsAuth(false);
           });
       }
     }
@@ -129,6 +157,8 @@ export function Header(): JSX.Element {
             </Link>
           </div>
         </div>
+
+        {loadingIsAuth && <div className="loading-simple-ring" />}
 
         <div className="col-3 mt-3 mt-md-0 text-center">
           {user ? (

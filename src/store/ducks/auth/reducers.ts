@@ -6,8 +6,9 @@ const initialState: AuthState = {
   error: null,
   /**
    * Set initialState.loading to true, so that
-   * [Login] button is not rendered on Header opening,
-   * thus preventing momentary flickering of [Login].
+   * ssr does not render [Login] button.
+   * O/w, there will be flickering between logined username (rendered client-side)
+   * and [Login] button, when going to a different page that is ssr.
    */
   loading: true,
   success: null,
