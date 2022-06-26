@@ -86,7 +86,9 @@ export default function UpdateProfile(): JSX.Element {
       };
 
       if (e.target.files) {
-        reader.readAsDataURL(e.target.files[0]);
+        try {
+          reader.readAsDataURL(e.target.files[0]);
+        } catch {}
       }
     } else {
       setUser({ ...user, [e.target.name]: e.target.value });
@@ -152,6 +154,7 @@ export default function UpdateProfile(): JSX.Element {
                     className="custom-file-input"
                     id="customFile"
                     accept="images/*"
+                    disabled={loading || userUpdate.loading}
                     onChange={onChange}
                   />
                   <label className="custom-file-label" htmlFor="customFile">
