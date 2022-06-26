@@ -17,7 +17,7 @@ export function Header(): JSX.Element {
 
   // https://stackoverflow.com/questions/59800913/type-safe-usedispatch-with-redux-thunk
   const dispatch = useAppDispatch();
-  const { user, error, loading } = useSelector((state: AppState) => state.auth);
+  const { user, error, loading, success } = useSelector((state: AppState) => state.auth);
 
   const userRef = useRef(user);
 
@@ -197,7 +197,7 @@ export function Header(): JSX.Element {
             </div>
           ) : (
             <>
-              {!loading && (
+              {!loading && success === null && (
                 <Link href="/login">
                   <a className="btn btn-danger px-4 text-white login-header-btn float-right">Login</a>
                 </Link>

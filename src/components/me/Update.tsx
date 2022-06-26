@@ -1,13 +1,12 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useSelector } from 'react-redux';
 
 import { toast } from 'react-toastify';
 
 import ButtonLoader from '../Layout/ButtonLoader';
-import useRedirectToLoginIfNotAuthenticated from '../../hooks/useRedirectToLoginIfNotAuthenticated';
 import useAppDispatch from '../../hooks/useAppDispatch';
 import { AppState } from '../../store';
-import { updateUser } from '../../store/ducks/auth/action';
+import { loadUser, updateUser } from '../../store/ducks/auth/action';
 import { AuthActionType } from '../../store/ducks/auth/types';
 
 export default function UpdateProfile(): JSX.Element {
@@ -26,10 +25,27 @@ export default function UpdateProfile(): JSX.Element {
 
   const dispatch = useAppDispatch();
 
-  const redirectToLoginIfNotAuthenticated = useRedirectToLoginIfNotAuthenticated();
+  const isRefreshOnMount = useRef(false);
 
   useEffect(() => {
     if (userFromState) {
+      // refresh user state, fetch latest
+      isRefreshOnMount.current = true;
+      dispatch(loadUser());
+      return;
+    }
+    // Header will perform fetch... so just sit back and listen to pending user state change
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  useEffect(() => {
+    if (userFromState) {
+      if (isRefreshOnMount.current) {
+        // do not bother filling form with userFromState...
+        // cos will be overwritten by loadUser() above
+        isRefreshOnMount.current = false; // reset
+        return;
+      }
       // reflect user state into the form
       setUser({
         name: userFromState.name,
@@ -149,9 +165,9 @@ export default function UpdateProfile(): JSX.Element {
               id="login_button"
               type="submit"
               className="btn btn-block py-3"
-              disabled={loading || userUpdate.loading || redirectToLoginIfNotAuthenticated}
+              disabled={loading || userUpdate.loading}
             >
-              {loading || userUpdate.loading || redirectToLoginIfNotAuthenticated ? <ButtonLoader /> : 'UPDATE'}
+              {loading || userUpdate.loading ? <ButtonLoader /> : 'UPDATE'}
             </button>
           </form>
         </div>
