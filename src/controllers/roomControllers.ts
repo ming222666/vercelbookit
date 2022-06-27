@@ -167,19 +167,13 @@ const checkReviewAvailability = async (req: NextApiRequest, res: NextApiResponse
 };
 
 // Get all rooms - ADMIN   =>   /api/admin/rooms
-const allAdminRooms = async (
-  req: NextApiRequest,
-  res: NextApiResponse<{ success: boolean; rooms: IRoomDto[] }>,
-): Promise<void> => {
+const allAdminRooms = async (req: NextApiRequest, res: NextApiResponse<IRoomDto[]>): Promise<void> => {
   await db.connect();
-  const rooms: IRoomDto[] = await Room.find().lean();
+  const rooms: IRoomDto[] = await Room.find().sort({ name: 1 }).lean();
   convertDocsToObj(rooms);
   await db.disconnect();
 
-  res.status(200).json({
-    success: true,
-    rooms,
-  });
+  res.status(200).send(rooms);
 };
 
 export {
