@@ -9,7 +9,11 @@ import { useSelector } from 'react-redux';
 import { toast } from 'react-toastify';
 
 import { AppState } from '../../store';
+import useAppDispatch from '../../hooks/useAppDispatch';
 import { IBookingExtended } from '../../controllers/interfaces';
+import { MyBookingsActionType } from '../../store/ducks/bookings/myBookings/types';
+import { myBookings } from '../../store/ducks/bookings/myBookings/action';
+import Loader from '../../components/Layout/Loader';
 
 interface IRow {
   id: string | undefined;
@@ -32,12 +36,39 @@ function MDBDataTableWrapper(props: { data: IData; onPageChange: () => void }): 
 export const MemoizedMDBDataTable = React.memo(MDBDataTableWrapper);
 
 export default function MyBookings(): JSX.Element {
-  const { bookings, error } = useSelector((state: AppState) => state.bookings.myBookings);
+  const isSettled = useRef(false);
+  const bookings = useRef<IBookingExtended[]>([]);
+
+  const {
+    loading,
+    bookings: bookingsFromState,
+    error,
+    success,
+  } = useSelector((state: AppState) => state.bookings.myBookings);
+
+  const dispatch = useAppDispatch();
+
+  useEffect(() => {
+    dispatch(myBookings());
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  useEffect((): void => {
+    if (success) {
+      isSettled.current = true;
+      bookings.current = bookingsFromState;
+      dispatch({ type: MyBookingsActionType.RESET_MY_BOOKINGS_SUCCESS });
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [success]);
 
   useEffect((): void => {
     if (error) {
+      isSettled.current = true;
+      dispatch({ type: MyBookingsActionType.RESET_MY_BOOKINGS_FAIL });
       toast.error(error.errormsg);
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [error]);
 
   const memoizedDataForTable = useMemo((): IData => {
@@ -72,8 +103,8 @@ export default function MyBookings(): JSX.Element {
       rows: [],
     };
 
-    bookings.length > 0 &&
-      bookings.forEach((booking) => {
+    bookings.current.length > 0 &&
+      bookings.current.forEach((booking) => {
         data.rows.push({
           id: booking._id,
           checkIn: new Date(booking.checkInDate ? booking.checkInDate : 0).toLocaleString('en-US'),
@@ -103,7 +134,7 @@ export default function MyBookings(): JSX.Element {
 
     return data;
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [bookings.current]);
 
   const memoizedCallback = useCallback(() => {
     setBookingIdToPreviewInvoice('');
@@ -331,7 +362,11 @@ export default function MyBookings(): JSX.Element {
       <div className="container container-fluid">
         <h1 className="my-5">My Bookings</h1>
 
-        <MemoizedMDBDataTable data={memoizedDataForTable} onPageChange={memoizedCallback} />
+        {loading || !isSettled.current ? (
+          <Loader />
+        ) : (
+          <MemoizedMDBDataTable data={memoizedDataForTable} onPageChange={memoizedCallback} />
+        )}
       </div>
 
       <div ref={invoiceDivRef}></div>

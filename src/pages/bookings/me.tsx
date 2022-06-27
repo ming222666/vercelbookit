@@ -1,14 +1,9 @@
 import React from 'react';
-import type { NextPage } from 'next';
+import type { NextPage, GetServerSideProps } from 'next';
 import { getSession } from 'next-auth/react';
-import { ThunkDispatch } from 'redux-thunk';
 
 import Layout from '../../components/Layout';
 import MyBookings from '../../components/booking/MyBookings';
-import { wrapper } from '../../store';
-import { myBookings } from '../../store/ducks/bookings/myBookings/action';
-import { MyBookingsAction } from '../../store/ducks/bookings/myBookings/types';
-import { MyBookingsState } from '../../store/ducks/bookings/myBookings/models/MyBookingsState';
 
 const MyBookingsPage: NextPage = () => {
   return (
@@ -18,9 +13,8 @@ const MyBookingsPage: NextPage = () => {
   );
 };
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-export const getServerSideProps = wrapper.getServerSideProps((store) => async (ctx): Promise<any> => {
-  const session = await getSession({ req: ctx.req });
+export const getServerSideProps: GetServerSideProps = async (context) => {
+  const session = await getSession({ req: context.req });
 
   if (!session) {
     return {
@@ -31,9 +25,9 @@ export const getServerSideProps = wrapper.getServerSideProps((store) => async (c
     };
   }
 
-  await (store.dispatch as ThunkDispatch<MyBookingsState, undefined, MyBookingsAction>)(
-    myBookings(ctx.req.headers.cookie, ctx.req),
-  );
-});
+  return {
+    props: {},
+  };
+};
 
 export default MyBookingsPage;

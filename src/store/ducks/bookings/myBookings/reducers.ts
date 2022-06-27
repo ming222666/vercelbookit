@@ -34,6 +34,20 @@ const myBookingsReducer = (state: MyBookingsState = initialState, action: MyBook
         loading: false,
         success: true,
       };
+    case MyBookingsActionType.RESET_MY_BOOKINGS_FAIL:
+      return {
+        ...state,
+        error: null,
+        loading: false,
+        success: null,
+      };
+    case MyBookingsActionType.RESET_MY_BOOKINGS_SUCCESS:
+      return {
+        ...state,
+        error: null,
+        loading: false,
+        success: null,
+      };
     default:
       return state;
   }
