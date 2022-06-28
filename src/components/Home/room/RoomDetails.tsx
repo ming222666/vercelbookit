@@ -150,7 +150,6 @@ export function RoomDetails({ room, error }: Props): JSX.Element {
       <div className="container container-fluid">
         <h2 className="mt-5">{room?.name}</h2>
         <p>{room?.address}</p>
-
         <div className="ratings mt-auto mb-3">
           <div className="rating-outer">
             <div
@@ -162,7 +161,6 @@ export function RoomDetails({ room, error }: Props): JSX.Element {
           </div>
           <span id="no_of_reviews">({room ? room.numOfReviews : 0} Reviews)</span>
         </div>
-
         <Carousel>
           {room &&
             room.images.map((image) => (
@@ -173,7 +171,6 @@ export function RoomDetails({ room, error }: Props): JSX.Element {
               </Carousel.Item>
             ))}
         </Carousel>
-
         <div className="row my-5">
           <div className="col-12 col-md-6 col-lg-8">
             <h3>Description</h3>
@@ -249,9 +246,7 @@ export function RoomDetails({ room, error }: Props): JSX.Element {
             </div>
           </div>
         </div>
-
-        <NewReview />
-
+        {!error && <NewReview />}
         {room?.reviews && room.reviews.length > 0 ? (
           <ListReviews reviews={room.reviews} />
         ) : (
