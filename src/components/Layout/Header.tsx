@@ -227,6 +227,8 @@ export function Header(): JSX.Element {
             </>
           )}
         </div>
+
+        {!user && loading && <div className="loading-simple-ring" />}
       </div>
     </nav>
   );
