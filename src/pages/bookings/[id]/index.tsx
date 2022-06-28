@@ -25,7 +25,7 @@ export const getServerSideProps = wrapper.getServerSideProps((store) => async (c
   if (!session) {
     return {
       redirect: {
-        destination: '/login',
+        destination: `/login?redirect=/bookings/${ctx.params?.id}`,
         permanent: false,
       },
     };
