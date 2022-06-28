@@ -14,7 +14,7 @@ export interface IRoomDtodddd {
 }
 
 export interface IRoomDto {
-  _id: string;
+  _id?: string;
   name: string;
   pricePerNight: number;
   description: string;
@@ -26,16 +26,16 @@ export interface IRoomDto {
   isAvailAirConditioned: number;
   isAvailRoomCleaning: number;
   isAllowedPets: number;
-  rating: number;
-  numOfReviews: number;
-  images: [
+  rating?: number;
+  numOfReviews?: number;
+  images?: [
     {
       public_id: string;
       url: string;
     },
   ];
   category: string;
-  reviews: [
+  reviews?: [
     {
       _id?: string;
       user: string;
@@ -44,9 +44,9 @@ export interface IRoomDto {
       comment: string;
     },
   ];
-  user: string;
-  createdAt: number;
-  updatedAt: number;
+  user?: string;
+  createdAt?: number;
+  updatedAt?: number;
 }
 
 export interface IAllRoomsDto {

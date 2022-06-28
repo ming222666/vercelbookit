@@ -17,6 +17,13 @@ const roomDetailsReducer = (state: RoomDetailsState = initialState, action: Room
         loading: true,
         success: null,
       };
+    case RoomDetailsActionType.ROOM_DETAILS_FAIL:
+      return {
+        ...state,
+        error: action.payload,
+        loading: false,
+        success: null,
+      };
     case RoomDetailsActionType.ROOM_DETAILS_SUCCESS:
       return {
         ...state,
@@ -25,11 +32,14 @@ const roomDetailsReducer = (state: RoomDetailsState = initialState, action: Room
         loading: false,
         success: true,
       };
-    case RoomDetailsActionType.ROOM_DETAILS_FAIL:
+    case RoomDetailsActionType.ROOM_DETAILS_RESET_FAIL:
       return {
         ...state,
-        error: action.payload,
-        loading: false,
+        error: null,
+      };
+    case RoomDetailsActionType.ROOM_DETAILS_RESET_SUCCESS:
+      return {
+        ...state,
         success: null,
       };
     default:
