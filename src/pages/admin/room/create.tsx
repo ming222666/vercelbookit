@@ -7,7 +7,7 @@ import RoomCreate from '../../../components/admin/rooms/RoomCreate';
 
 const RoomCreatePage: NextPage = () => {
   return (
-    <Layout title="Create Room">
+    <Layout title="New Room">
       <RoomCreate />
     </Layout>
   );

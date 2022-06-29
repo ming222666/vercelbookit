@@ -98,6 +98,9 @@ export default function RoomCreate(): JSX.Element {
   const submitHandler = async (e: React.SyntheticEvent<Element, Event>): Promise<void> => {
     e.preventDefault();
 
+    /////// imagesBase64
+    // if (images.length === 0) return toast.error('Please upload images.')
+
     const roomData: IRoomWithImagesBase64Dto = {
       name: name?.trim() || '',
       pricePerNight: Number(price),
@@ -127,7 +130,7 @@ export default function RoomCreate(): JSX.Element {
             <div className="row wrapper">
               <div className="col-10 col-lg-8">
                 <form className="shadow-lg" onSubmit={submitHandler} encType="multipart/form-data">
-                  <h1 className="mb-4">Update Room</h1>
+                  <h1 className="mb-4">New Room</h1>
                   <div className="form-group">
                     <label htmlFor="name_field">Name</label>
                     <input
