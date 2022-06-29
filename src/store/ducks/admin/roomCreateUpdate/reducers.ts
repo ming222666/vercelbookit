@@ -1,15 +1,20 @@
+import { RoomCreateAction, RoomCreateActionType } from './types';
 import { RoomUpdateAction, RoomUpdateActionType } from './types';
-import { RoomUpdateState } from './models/RoomUpdateState';
+import { RoomCreateUpdateState } from './models/RoomCreateUpdateState';
 
-const initialState: RoomUpdateState = {
+const initialState: RoomCreateUpdateState = {
   room: null,
   error: null,
   loading: false,
   success: null,
 };
 
-const roomUpdateReducer = (state: RoomUpdateState = initialState, action: RoomUpdateAction): RoomUpdateState => {
+const roomCreateUpdateReducer = (
+  state: RoomCreateUpdateState = initialState,
+  action: RoomCreateAction | RoomUpdateAction,
+): RoomCreateUpdateState => {
   switch (action.type) {
+    case RoomCreateActionType.ROOM_CREATE_REQUEST:
     case RoomUpdateActionType.ROOM_UPDATE_REQUEST:
       return {
         ...state,
@@ -17,6 +22,7 @@ const roomUpdateReducer = (state: RoomUpdateState = initialState, action: RoomUp
         loading: true,
         success: null,
       };
+    case RoomCreateActionType.ROOM_CREATE_FAIL:
     case RoomUpdateActionType.ROOM_UPDATE_FAIL:
       return {
         ...state,
@@ -25,6 +31,7 @@ const roomUpdateReducer = (state: RoomUpdateState = initialState, action: RoomUp
         loading: false,
         success: null,
       };
+    case RoomCreateActionType.ROOM_CREATE_SUCCESS:
     case RoomUpdateActionType.ROOM_UPDATE_SUCCESS:
       return {
         ...state,
@@ -33,11 +40,13 @@ const roomUpdateReducer = (state: RoomUpdateState = initialState, action: RoomUp
         loading: false,
         success: true,
       };
+    case RoomCreateActionType.ROOM_CREATE_RESET_FAIL:
     case RoomUpdateActionType.ROOM_UPDATE_RESET_FAIL:
       return {
         ...state,
         error: null,
       };
+    case RoomCreateActionType.ROOM_CREATE_RESET_SUCCESS:
     case RoomUpdateActionType.ROOM_UPDATE_RESET_SUCCESS:
       return {
         ...state,
@@ -48,4 +57,4 @@ const roomUpdateReducer = (state: RoomUpdateState = initialState, action: RoomUp
   }
 };
 
-export default roomUpdateReducer;
+export default roomCreateUpdateReducer;

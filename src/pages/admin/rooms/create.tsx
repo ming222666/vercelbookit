@@ -2,13 +2,13 @@ import React from 'react';
 import type { NextPage, GetServerSideProps } from 'next';
 import { getSession } from 'next-auth/react';
 
-import Layout from '../../../../components/Layout';
-import RoomUpdate from '../../../../components/admin/rooms/RoomUpdate';
+import Layout from '../../../components/Layout';
+import RoomCreate from '../../../components/admin/rooms/RoomCreate';
 
-const RoomUpdatePage: NextPage = () => {
+const RoomCreatePage: NextPage = () => {
   return (
-    <Layout title="Update Room">
-      <RoomUpdate />
+    <Layout title="Create Room">
+      <RoomCreate />
     </Layout>
   );
 };
@@ -19,7 +19,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
   if (!session) {
     return {
       redirect: {
-        destination: `/login?redirect=/admin/rooms/${context.params?.id}`,
+        destination: '/login?redirect=/admin/rooms/create',
         permanent: false,
       },
     };
@@ -30,4 +30,4 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
   };
 };
 
-export default RoomUpdatePage;
+export default RoomCreatePage;

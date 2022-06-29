@@ -1,4 +1,4 @@
-import React, { useRef, useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useRouter } from 'next/router';
 import { useSelector } from 'react-redux';
 
@@ -6,12 +6,10 @@ import { toast } from 'react-toastify';
 
 import { AppState } from '../../../store';
 import useAppDispatch from '../../../hooks/useAppDispatch';
-import { getRoom } from '../../../store/ducks/roomDetails/action';
-import { roomUpdate } from '../../../store/ducks/admin/roomCreateUpdate/action';
-import { RoomDetailsActionType } from '../../../store/ducks/roomDetails/types';
-import { RoomUpdateActionType } from '../../../store/ducks/admin/roomCreateUpdate/types';
+import { roomCreate } from '../../../store/ducks/admin/roomCreateUpdate/action';
+import { RoomCreateActionType } from '../../../store/ducks/admin/roomCreateUpdate/types';
 import Loader from '../../../components/Layout/Loader';
-import { IRoomDto } from '../../../db/interfaces';
+import { IRoomWithImagesBase64Dto } from '../../../db/interfaces';
 import ButtonLoader from '../../../components/Layout/ButtonLoader';
 
 const regexInt = new RegExp('^[0-9]*$');
@@ -26,7 +24,9 @@ const testRegexInt = (val: string, f: (val: string) => void): void => {
   }
 };
 
-export default function RoomUpdate(): JSX.Element {
+export default function RoomCreate(): JSX.Element {
+  const [isMounted, setIsMounted] = useState(false);
+
   const [name, setName] = useState<string | undefined>('');
   const [price, setPrice] = useState<string | undefined>('0');
   const [description, setDescription] = useState<string | undefined>('');
@@ -40,96 +40,65 @@ export default function RoomUpdate(): JSX.Element {
   const [petsAllowed, setPetsAllowed] = useState<number | undefined>(0);
   const [roomCleaning, setRoomCleaning] = useState<number | undefined>(0);
 
-  const { room, error, /* loading, */ success } = useSelector((state: AppState) => state.roomDetails);
   const { user } = useSelector((state: AppState) => state.auth);
   const {
-    room: roomFromUpdate,
-    error: errorFromUpdate,
-    loading: loadingFromUpdate,
-    success: successFromUpdate,
+    room: roomFromCreate,
+    error: errorFromCreate,
+    loading: loadingFromCreate,
+    success: successFromCreate,
   } = useSelector((state: AppState) => state.admin.roomCreateUpdate);
 
   const dispatch = useAppDispatch();
-  const outcomeFetchRoomDetails = useRef('');
 
   const router = useRouter();
-  const { id } = router.query;
 
   useEffect(() => {
-    if (user && user.role === 'admin') {
-      dispatch(getRoom(id as string));
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [user]);
+    setIsMounted(true);
+  }, []);
 
   useEffect((): void => {
-    if (error) {
-      outcomeFetchRoomDetails.current = '-1';
-      dispatch({ type: RoomDetailsActionType.ROOM_DETAILS_RESET_FAIL });
-      toast.error(error.errormsg);
+    if (errorFromCreate) {
+      dispatch({ type: RoomCreateActionType.ROOM_CREATE_RESET_FAIL });
+      toast.error(errorFromCreate.errormsg);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [error]);
+  }, [errorFromCreate]);
 
   useEffect((): void => {
-    if (success) {
-      outcomeFetchRoomDetails.current = 'ok';
-
-      dispatch({ type: RoomDetailsActionType.ROOM_DETAILS_RESET_SUCCESS });
-      setName(room?.name);
-      setPrice(room?.pricePerNight.toString());
-      setDescription(room?.description);
-      setAddress(room?.address);
-      setCategory(room?.category);
-      setGuestCapacity(room?.guestCapacity.toString());
-      setNumOfBeds(room?.numOfBeds.toString());
-      setInternet(room?.isAvailInternet);
-      setBreakfast(room?.isAvailBreakfast);
-      setAirConditioned(room?.isAvailAirConditioned);
-      setPetsAllowed(room?.isAllowedPets);
-      setRoomCleaning(room?.isAvailRoomCleaning);
+    if (successFromCreate) {
+      dispatch({ type: RoomCreateActionType.ROOM_CREATE_RESET_SUCCESS });
+      toast.success('Room successfully created', {
+        autoClose: 1500,
+        onClose: (): void => {
+          router.push('/admin/rooms');
+        },
+      });
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [success]);
+  }, [successFromCreate]);
 
   useEffect((): void => {
-    if (errorFromUpdate) {
-      dispatch({ type: RoomUpdateActionType.ROOM_UPDATE_RESET_FAIL });
-      toast.error(errorFromUpdate.errormsg);
+    if (roomFromCreate) {
+      setName(roomFromCreate?.name);
+      setPrice(roomFromCreate?.pricePerNight.toString());
+      setDescription(roomFromCreate?.description);
+      setAddress(roomFromCreate?.address);
+      setCategory(roomFromCreate?.category);
+      setGuestCapacity(roomFromCreate?.guestCapacity.toString());
+      setNumOfBeds(roomFromCreate?.numOfBeds.toString());
+      setInternet(roomFromCreate?.isAvailInternet);
+      setBreakfast(roomFromCreate?.isAvailBreakfast);
+      setAirConditioned(roomFromCreate?.isAvailAirConditioned);
+      setPetsAllowed(roomFromCreate?.isAllowedPets);
+      setRoomCleaning(roomFromCreate?.isAvailRoomCleaning);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [errorFromUpdate]);
-
-  useEffect((): void => {
-    if (successFromUpdate) {
-      dispatch({ type: RoomUpdateActionType.ROOM_UPDATE_RESET_SUCCESS });
-      toast.success('Room successfully updated');
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [successFromUpdate]);
-
-  useEffect((): void => {
-    if (roomFromUpdate) {
-      setName(roomFromUpdate?.name);
-      setPrice(roomFromUpdate?.pricePerNight.toString());
-      setDescription(roomFromUpdate?.description);
-      setAddress(roomFromUpdate?.address);
-      setCategory(roomFromUpdate?.category);
-      setGuestCapacity(roomFromUpdate?.guestCapacity.toString());
-      setNumOfBeds(roomFromUpdate?.numOfBeds.toString());
-      setInternet(roomFromUpdate?.isAvailInternet);
-      setBreakfast(roomFromUpdate?.isAvailBreakfast);
-      setAirConditioned(roomFromUpdate?.isAvailAirConditioned);
-      setPetsAllowed(roomFromUpdate?.isAllowedPets);
-      setRoomCleaning(roomFromUpdate?.isAvailRoomCleaning);
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [roomFromUpdate]);
+  }, [roomFromCreate]);
 
   const submitHandler = async (e: React.SyntheticEvent<Element, Event>): Promise<void> => {
     e.preventDefault();
 
-    const roomData: IRoomDto = {
+    const roomData: IRoomWithImagesBase64Dto = {
       name: name?.trim() || '',
       pricePerNight: Number(price),
       description: description?.trim() || '',
@@ -142,17 +111,18 @@ export default function RoomUpdate(): JSX.Element {
       isAvailAirConditioned: Number(airConditioned),
       isAllowedPets: Number(petsAllowed),
       isAvailRoomCleaning: Number(roomCleaning),
+      imagesBase64: [],
     };
 
-    dispatch(roomUpdate(id as string, roomData));
+    dispatch(roomCreate(roomData));
   };
 
   return (
     <>
       {user && user.role === 'admin' ? (
-        !outcomeFetchRoomDetails.current ? (
+        !isMounted ? (
           <Loader />
-        ) : outcomeFetchRoomDetails.current !== '-1' ? (
+        ) : (
           <div className="container container-fluid">
             <div className="row wrapper">
               <div className="col-10 col-lg-8">
@@ -318,15 +288,13 @@ export default function RoomUpdate(): JSX.Element {
                     </label>
                   </div>
 
-                  <button type="submit" className="btn btn-block new-room-btn py-3" disabled={loadingFromUpdate}>
-                    {loadingFromUpdate ? <ButtonLoader /> : 'UPDATE'}
+                  <button type="submit" className="btn btn-block new-room-btn py-3" disabled={loadingFromCreate}>
+                    {loadingFromCreate ? <ButtonLoader /> : 'CREATE'}
                   </button>
                 </form>
               </div>
             </div>
           </div>
-        ) : (
-          'Error while fetching room details'
         )
       ) : user ? (
         'Admin role is required to view page'

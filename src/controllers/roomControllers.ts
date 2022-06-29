@@ -1,14 +1,16 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
 
+import { v2 as cloudinary } from 'cloudinary';
+
 import db from '../db/db';
-import { IRoomDto, IErrorDto, IAllRoomsDto } from '../db/interfaces';
+import { IRoomDto, IErrorDto, IAllRoomsDto, IRoomWithImagesBase64Dto } from '../db/interfaces';
 import Room from '../db/models/Room';
 import Booking from '../db/models/Booking';
 import APIFeatures from '../utils/apiFeatures';
 import convertDocsToObj from '../utils/convertDocsToObj';
 import { IWithBodyNextApiRequest } from './interfaces';
 
-type RoomNextApiRequest = IWithBodyNextApiRequest<IRoomDto>;
+type RoomNextApiRequest = IWithBodyNextApiRequest<IRoomWithImagesBase64Dto>;
 
 const allRooms = async (req: NextApiRequest, res: NextApiResponse<IAllRoomsDto>): Promise<void> => {
   await db.connect();
@@ -35,11 +37,32 @@ const allRooms = async (req: NextApiRequest, res: NextApiResponse<IAllRoomsDto>)
 
 // Create new room => /api/rooms
 const newRoom = async (req: RoomNextApiRequest, res: NextApiResponse<IRoomDto>): Promise<void> => {
+  const images = req.body.imagesBase64;
+
+  const imagesLinks: {
+    public_id: string;
+    url: string;
+  }[] = [];
+
+  for (let i = 0; i < images.length; i++) {
+    const result = await cloudinary.uploader.upload(images[i], {
+      folder: 'bookit/rooms',
+    });
+
+    imagesLinks.push({
+      public_id: result.public_id,
+      url: result.secure_url,
+    });
+  }
+
+  req.body.images = imagesLinks;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  req.body.user = (req as any).user._id;
+
   await db.connect();
-  const newRm = new Room({
-    ...req.body,
-  });
-  const room = await newRm.save();
+
+  const room = await Room.create(req.body);
+
   await db.disconnect();
   res.status(201).send(room);
 };

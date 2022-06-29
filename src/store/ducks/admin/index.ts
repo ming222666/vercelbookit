@@ -1,12 +1,12 @@
 import { combineReducers } from 'redux';
 
 import rooms from './rooms';
-import roomUpdate from './roomUpdate';
+import roomCreateUpdate from './roomCreateUpdate';
 // ...
 
 const reducer = combineReducers({
   rooms,
-  roomUpdate,
+  roomCreateUpdate,
   // ...
 });
 

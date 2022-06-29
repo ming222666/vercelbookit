@@ -27,7 +27,7 @@ export function RoomItem(props: { room: IRoomDto }): JSX.Element {
               <div
                 className="rating-inner"
                 style={{
-                  width: `${(room.rating / 5) * 100}%`,
+                  width: `${((room.rating ? room.rating : 0) / 5) * 100}%`,
                 }}
               ></div>
             </div>

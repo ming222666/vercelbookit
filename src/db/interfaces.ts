@@ -28,25 +28,25 @@ export interface IRoomDto {
   isAllowedPets: number;
   rating?: number;
   numOfReviews?: number;
-  images?: [
-    {
-      public_id: string;
-      url: string;
-    },
-  ];
+  images?: {
+    public_id: string;
+    url: string;
+  }[];
   category: string;
-  reviews?: [
-    {
-      _id?: string;
-      user: string;
-      name: string;
-      rating: number;
-      comment: string;
-    },
-  ];
+  reviews?: {
+    _id?: string;
+    user: string;
+    name: string;
+    rating: number;
+    comment: string;
+  }[];
   user?: string;
   createdAt?: number;
   updatedAt?: number;
+}
+
+export interface IRoomWithImagesBase64Dto extends IRoomDto {
+  imagesBase64: string[];
 }
 
 export interface IAllRoomsDto {

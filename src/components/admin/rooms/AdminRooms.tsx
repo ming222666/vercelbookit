@@ -115,7 +115,7 @@ export default function AdminRooms(): JSX.Element {
               <button
                 className="btn btn-danger mx-2"
                 onClick={(): void => {
-                  deleteRoom(room._id);
+                  deleteRoom(room._id ? room._id : '');
                 }}
               >
                 <i className="fa fa-trash"></i>
