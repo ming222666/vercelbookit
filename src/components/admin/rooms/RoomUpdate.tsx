@@ -137,7 +137,7 @@ export default function RoomUpdate(): JSX.Element {
 
   useEffect((): void => {
     if (successFromUpdate) {
-      router.push('/admin/rooms');
+      router.push('/admin/rooms?sort=yes');
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [successFromUpdate]);

@@ -126,7 +126,10 @@ const updateRoom = async (req: RoomNextApiRequest, res: NextApiResponse<IRoomDto
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   req.body.user = (req as any).user._id;
 
-  const roomToUpdate: IRoomDto = await Room.findByIdAndUpdate(req.query.id, req.body, {
+  const changesToUpdate = req.body;
+  changesToUpdate['updatedAt'] = Date.now();
+
+  const roomToUpdate: IRoomDto = await Room.findByIdAndUpdate(req.query.id, changesToUpdate, {
     new: true,
     runValidators: true,
     useFindAndModify: false,
@@ -223,7 +226,8 @@ const checkReviewAvailability = async (req: NextApiRequest, res: NextApiResponse
 // Get all rooms - ADMIN   =>   /api/admin/rooms
 const allAdminRooms = async (req: NextApiRequest, res: NextApiResponse<IRoomDto[]>): Promise<void> => {
   await db.connect();
-  const rooms: IRoomDto[] = await Room.find().sort({ name: 1 }).lean();
+  const sortBy = req.query.sort ? { updatedAt: -1 } : { name: 1 };
+  const rooms: IRoomDto[] = await Room.find().sort(sortBy).lean();
   convertDocsToObj(rooms);
   await db.disconnect();
 

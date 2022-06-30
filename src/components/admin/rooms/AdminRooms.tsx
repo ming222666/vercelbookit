@@ -1,5 +1,6 @@
 import React, { useEffect, useRef, useMemo } from 'react';
 import Link from 'next/link';
+import { useRouter } from 'next/router';
 
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const { MDBDataTable } = require('mdbreact');
@@ -36,13 +37,17 @@ export default function AdminRooms(): JSX.Element {
   const isSettled = useRef(false);
   const rooms = useRef<IRoomDto[]>([]);
 
+  const router = useRouter();
+
+  const { sort } = router.query;
+
   const { loading, rooms: roomsFromState, error, success } = useSelector((state: AppState) => state.admin.rooms);
   // const { error: deleteError, isDeleted } = useSelector(state => state.room)
 
   const dispatch = useAppDispatch();
 
   useEffect(() => {
-    dispatch(getRooms());
+    dispatch(getRooms(sort ? 'yes' : ''));
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 

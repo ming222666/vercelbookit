@@ -77,7 +77,7 @@ export default function RoomCreate(): JSX.Element {
 
   useEffect((): void => {
     if (successFromCreate) {
-      router.push('/admin/rooms');
+      router.push('/admin/rooms?sort=yes');
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [successFromCreate]);
