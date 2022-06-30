@@ -41,8 +41,8 @@ export default function UpdateProfile(): JSX.Element {
   useEffect(() => {
     if (userFromState) {
       if (isRefreshOnMount.current) {
-        // do not bother filling form with userFromState...
-        // cos will be overwritten by loadUser() above
+        // do not bother filling form with existing userFromState...
+        // cos state will be overwritten by loadUser() above
         isRefreshOnMount.current = false; // reset
         return;
       }
