@@ -95,6 +95,37 @@ const updateRoom = async (req: RoomNextApiRequest, res: NextApiResponse<IRoomDto
     });
     return;
   }
+
+  const images = req.body.imagesBase64;
+
+  if (images && images.length > 0) {
+    // Delete images associated with the room
+    for (let i = 0; i < room.images.length; i++) {
+      await cloudinary.uploader.destroy(room.images[i].public_id);
+    }
+
+    const imagesLinks: {
+      public_id: string;
+      url: string;
+    }[] = [];
+
+    for (let i = 0; i < images.length; i++) {
+      const result = await cloudinary.uploader.upload(images[i], {
+        folder: 'bookit/rooms',
+      });
+
+      imagesLinks.push({
+        public_id: result.public_id,
+        url: result.secure_url,
+      });
+    }
+
+    req.body.images = imagesLinks;
+  }
+
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  req.body.user = (req as any).user._id;
+
   const roomToUpdate: IRoomDto = await Room.findByIdAndUpdate(req.query.id, req.body, {
     new: true,
     runValidators: true,

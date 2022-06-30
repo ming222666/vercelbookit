@@ -61,7 +61,7 @@ export default function RoomCreate(): JSX.Element {
     return () => {
       // so that when user revisits page,
       // an empty room is shown instead of room from
-      // an earlier visit where create room succeeded/failed.
+      // an earlier visit where create room failed.
       dispatch({ type: RoomCreateActionType.ROOM_CREATE_RESET });
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps

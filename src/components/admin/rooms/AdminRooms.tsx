@@ -136,7 +136,13 @@ export default function AdminRooms(): JSX.Element {
   return (
     <>
       <div className="container container-fluid">
-        <h1 className="my-5">All Rooms</h1>
+        <h1 className="my-5">
+          {`${rooms && rooms.current.length} Rooms`}
+
+          <Link href="/admin/room/new">
+            <a className="mt-0 btn text-white float-right new-room-btn">Create Room</a>
+          </Link>
+        </h1>
 
         {loading || !isSettled.current ? <Loader /> : <MemoizedMDBDataTable data={memoizedDataForTable} />}
       </div>

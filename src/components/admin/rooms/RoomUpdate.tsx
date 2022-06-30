@@ -11,7 +11,7 @@ import { roomUpdate } from '../../../store/ducks/admin/roomCreateUpdate/action';
 import { RoomDetailsActionType } from '../../../store/ducks/roomDetails/types';
 import { RoomUpdateActionType } from '../../../store/ducks/admin/roomCreateUpdate/types';
 import Loader from '../../../components/Layout/Loader';
-import { IRoomDto } from '../../../db/interfaces';
+import { IRoomWithImagesBase64Dto } from '../../../db/interfaces';
 import ButtonLoader from '../../../components/Layout/ButtonLoader';
 
 const regexInt = new RegExp('^[0-9]*$');
@@ -26,7 +26,27 @@ const testRegexInt = (val: string, f: (val: string) => void): void => {
   }
 };
 
+const extractImgUrls = (
+  imgs:
+    | {
+        public_id: string;
+        url: string;
+      }[]
+    | undefined,
+): string[] => {
+  if (!imgs) {
+    return [];
+  }
+  const urls: string[] = [];
+  imgs.forEach((img) => {
+    urls.push(img.url);
+  });
+  return urls;
+};
+
 export default function RoomUpdate(): JSX.Element {
+  const imagesBase64 = useRef<string[]>([]);
+
   const [name, setName] = useState<string | undefined>('');
   const [price, setPrice] = useState<string | undefined>('0');
   const [description, setDescription] = useState<string | undefined>('');
@@ -39,6 +59,8 @@ export default function RoomUpdate(): JSX.Element {
   const [airConditioned, setAirConditioned] = useState<number | undefined>(0);
   const [petsAllowed, setPetsAllowed] = useState<number | undefined>(0);
   const [roomCleaning, setRoomCleaning] = useState<number | undefined>(0);
+
+  const [images, setImages] = useState<string[]>([]);
 
   const { room, error, /* loading, */ success } = useSelector((state: AppState) => state.roomDetails);
   const { user } = useSelector((state: AppState) => state.auth);
@@ -64,7 +86,7 @@ export default function RoomUpdate(): JSX.Element {
 
   useEffect((): void => {
     if (error) {
-      outcomeFetchRoomDetails.current = '-1';
+      outcomeFetchRoomDetails.current = 'bad';
       dispatch({ type: RoomDetailsActionType.ROOM_DETAILS_RESET_FAIL });
       toast.error(error.errormsg);
     }
@@ -76,6 +98,7 @@ export default function RoomUpdate(): JSX.Element {
       outcomeFetchRoomDetails.current = 'ok';
 
       dispatch({ type: RoomDetailsActionType.ROOM_DETAILS_RESET_SUCCESS });
+
       setName(room?.name);
       setPrice(room?.pricePerNight.toString());
       setDescription(room?.description);
@@ -88,9 +111,21 @@ export default function RoomUpdate(): JSX.Element {
       setAirConditioned(room?.isAvailAirConditioned);
       setPetsAllowed(room?.isAllowedPets);
       setRoomCleaning(room?.isAvailRoomCleaning);
+
+      setImages(extractImgUrls(room?.images));
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [success]);
+
+  useEffect((): (() => void) => {
+    return () => {
+      // so that when user revisits page,
+      // an empty room is shown instead of room from
+      // an earlier visit where update of room failed.
+      dispatch({ type: RoomUpdateActionType.ROOM_UPDATE_RESET });
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   useEffect((): void => {
     if (errorFromUpdate) {
@@ -102,8 +137,7 @@ export default function RoomUpdate(): JSX.Element {
 
   useEffect((): void => {
     if (successFromUpdate) {
-      dispatch({ type: RoomUpdateActionType.ROOM_UPDATE_RESET_SUCCESS });
-      toast.success('Room successfully updated');
+      router.push('/admin/rooms');
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [successFromUpdate]);
@@ -129,7 +163,12 @@ export default function RoomUpdate(): JSX.Element {
   const submitHandler = async (e: React.SyntheticEvent<Element, Event>): Promise<void> => {
     e.preventDefault();
 
-    const roomData: IRoomDto = {
+    if (images.length === 0) {
+      toast.error('Please upload images.');
+      return;
+    }
+
+    const roomData: IRoomWithImagesBase64Dto = {
       name: name?.trim() || '',
       pricePerNight: Number(price),
       description: description?.trim() || '',
@@ -142,9 +181,37 @@ export default function RoomUpdate(): JSX.Element {
       isAvailAirConditioned: Number(airConditioned),
       isAllowedPets: Number(petsAllowed),
       isAvailRoomCleaning: Number(roomCleaning),
+      imagesBase64: imagesBase64.current,
     };
 
     dispatch(roomUpdate(id as string, roomData));
+  };
+
+  const onChange = (e: React.ChangeEvent<HTMLInputElement>): void => {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const files = Array.from((e.target as any).files);
+
+    imagesBase64.current = [];
+
+    files.forEach((file, idx) => {
+      const reader = new FileReader();
+
+      reader.onload = (): void => {
+        if (reader.readyState === 2) {
+          imagesBase64.current.push(reader.result as string);
+          if (idx === files.length - 1) {
+            setImages(imagesBase64.current);
+            return;
+          }
+        }
+      };
+
+      if (e.target.files) {
+        try {
+          reader.readAsDataURL(file as Blob);
+        } catch {}
+      }
+    });
   };
 
   return (
@@ -152,7 +219,9 @@ export default function RoomUpdate(): JSX.Element {
       {user && user.role === 'admin' ? (
         !outcomeFetchRoomDetails.current ? (
           <Loader />
-        ) : outcomeFetchRoomDetails.current !== '-1' ? (
+        ) : outcomeFetchRoomDetails.current !== 'ok' ? (
+          'Error while fetching room details'
+        ) : (
           <div className="container container-fluid">
             <div className="row wrapper">
               <div className="col-10 col-lg-8">
@@ -318,6 +387,29 @@ export default function RoomUpdate(): JSX.Element {
                     </label>
                   </div>
 
+                  <div className="form-group mt-4">
+                    <label>Images</label>
+                    <div className="custom-file">
+                      <input
+                        type="file"
+                        name="room_images"
+                        className="custom-file-input"
+                        id="customFile"
+                        onChange={onChange}
+                        multiple
+                        disabled={loadingFromUpdate}
+                      />
+                      <label className="custom-file-label" htmlFor="customFile">
+                        Choose Images
+                      </label>
+                    </div>
+
+                    {images.map((img) => (
+                      // eslint-disable-next-line @next/next/no-img-element
+                      <img src={img} key={img} alt="Images Preview" className="mt-3 mr-2" width="55" height="52" />
+                    ))}
+                  </div>
+
                   <button type="submit" className="btn btn-block new-room-btn py-3" disabled={loadingFromUpdate}>
                     {loadingFromUpdate ? <ButtonLoader /> : 'UPDATE'}
                   </button>
@@ -325,8 +417,6 @@ export default function RoomUpdate(): JSX.Element {
               </div>
             </div>
           </div>
-        ) : (
-          'Error while fetching room details'
         )
       ) : user ? (
         'Admin role is required to view page'
