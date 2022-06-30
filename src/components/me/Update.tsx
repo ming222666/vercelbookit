@@ -34,7 +34,7 @@ export default function UpdateProfile(): JSX.Element {
       dispatch(loadUser());
       return;
     }
-    // Header will perform fetch... so just sit back and listen to pending user state change
+    // Header will perform fetch user... so just sit back and listen to pending user state change
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
