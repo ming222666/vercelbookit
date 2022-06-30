@@ -10,6 +10,7 @@ export enum RoomCreateActionType {
   ROOM_CREATE_SUCCESS = 'roomCreate/ROOM_CREATE_SUCCESS',
   ROOM_CREATE_RESET_FAIL = 'roomCreate/ROOM_CREATE_RESET_FAIL',
   ROOM_CREATE_RESET_SUCCESS = 'roomCreate/ROOM_CREATE_RESET_SUCCESS',
+  ROOM_CREATE_RESET = 'roomCreate/ROOM_CREATE_RESET',
 }
 
 export interface RoomCreateRequestAction extends BaseAction {
@@ -34,12 +35,17 @@ export interface RoomCreateResetSuccessAction extends BaseAction {
   type: RoomCreateActionType.ROOM_CREATE_RESET_SUCCESS;
 }
 
+export interface RoomCreateResetAction extends BaseAction {
+  type: RoomCreateActionType.ROOM_CREATE_RESET;
+}
+
 export type RoomCreateAction =
   | RoomCreateRequestAction
   | RoomCreateFailAction
   | RoomCreateSuccessAction
   | RoomCreateResetFailAction
-  | RoomCreateResetSuccessAction;
+  | RoomCreateResetSuccessAction
+  | RoomCreateResetAction;
 
 /**
  * Room Update
@@ -50,6 +56,7 @@ export enum RoomUpdateActionType {
   ROOM_UPDATE_SUCCESS = 'roomUpdate/ROOM_UPDATE_SUCCESS',
   ROOM_UPDATE_RESET_FAIL = 'roomUpdate/ROOM_UPDATE_RESET_FAIL',
   ROOM_UPDATE_RESET_SUCCESS = 'roomUpdate/ROOM_UPDATE_RESET_SUCCESS',
+  ROOM_UPDATE_RESET = 'roomUpdate/ROOM_UPDATE_RESET',
 }
 
 export interface RoomUpdateRequestAction extends BaseAction {
@@ -74,9 +81,14 @@ export interface RoomUpdateResetSuccessAction extends BaseAction {
   type: RoomUpdateActionType.ROOM_UPDATE_RESET_SUCCESS;
 }
 
+export interface RoomUpdateResetAction extends BaseAction {
+  type: RoomUpdateActionType.ROOM_UPDATE_RESET;
+}
+
 export type RoomUpdateAction =
   | RoomUpdateRequestAction
   | RoomUpdateFailAction
   | RoomUpdateSuccessAction
   | RoomUpdateResetFailAction
-  | RoomUpdateResetSuccessAction;
+  | RoomUpdateResetSuccessAction
+  | RoomUpdateResetAction;

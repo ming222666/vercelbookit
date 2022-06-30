@@ -16,10 +16,12 @@ const roomSchema = new mongoose.Schema({
   description: {
     type: String,
     required: [true, 'Please enter room description'],
+    trim: true,
   },
   address: {
     type: String,
     required: [true, 'Please enter room address'],
+    trim: true,
   },
   guestCapacity: {
     type: Number,

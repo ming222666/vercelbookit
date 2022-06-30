@@ -19,7 +19,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
   if (!session) {
     return {
       redirect: {
-        destination: '/login?redirect=/admin/rooms/create',
+        destination: '/login?redirect=/admin/room/new',
         permanent: false,
       },
     };

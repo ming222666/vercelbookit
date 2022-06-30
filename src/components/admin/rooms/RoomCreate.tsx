@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import { useRouter } from 'next/router';
 import { useSelector } from 'react-redux';
 
@@ -27,6 +27,8 @@ const testRegexInt = (val: string, f: (val: string) => void): void => {
 export default function RoomCreate(): JSX.Element {
   const [isMounted, setIsMounted] = useState(false);
 
+  const imagesBase64 = useRef<string[]>([]);
+
   const [name, setName] = useState<string | undefined>('');
   const [price, setPrice] = useState<string | undefined>('0');
   const [description, setDescription] = useState<string | undefined>('');
@@ -40,6 +42,8 @@ export default function RoomCreate(): JSX.Element {
   const [petsAllowed, setPetsAllowed] = useState<number | undefined>(0);
   const [roomCleaning, setRoomCleaning] = useState<number | undefined>(0);
 
+  const [images, setImages] = useState<string[]>([]);
+
   const { user } = useSelector((state: AppState) => state.auth);
   const {
     room: roomFromCreate,
@@ -52,8 +56,15 @@ export default function RoomCreate(): JSX.Element {
 
   const router = useRouter();
 
-  useEffect(() => {
+  useEffect((): (() => void) => {
     setIsMounted(true);
+    return () => {
+      // so that when user revisits page,
+      // an empty room is shown instead of room from
+      // an earlier visit where create room succeeded/failed.
+      dispatch({ type: RoomCreateActionType.ROOM_CREATE_RESET });
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   useEffect((): void => {
@@ -66,13 +77,7 @@ export default function RoomCreate(): JSX.Element {
 
   useEffect((): void => {
     if (successFromCreate) {
-      dispatch({ type: RoomCreateActionType.ROOM_CREATE_RESET_SUCCESS });
-      toast.success('Room successfully created', {
-        autoClose: 1500,
-        onClose: (): void => {
-          router.push('/admin/rooms');
-        },
-      });
+      router.push('/admin/rooms');
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [successFromCreate]);
@@ -98,8 +103,10 @@ export default function RoomCreate(): JSX.Element {
   const submitHandler = async (e: React.SyntheticEvent<Element, Event>): Promise<void> => {
     e.preventDefault();
 
-    /////// imagesBase64
-    // if (images.length === 0) return toast.error('Please upload images.')
+    if (images.length === 0) {
+      toast.error('Please upload images.');
+      return;
+    }
 
     const roomData: IRoomWithImagesBase64Dto = {
       name: name?.trim() || '',
@@ -114,10 +121,37 @@ export default function RoomCreate(): JSX.Element {
       isAvailAirConditioned: Number(airConditioned),
       isAllowedPets: Number(petsAllowed),
       isAvailRoomCleaning: Number(roomCleaning),
-      imagesBase64: [],
+      imagesBase64: imagesBase64.current,
     };
 
     dispatch(roomCreate(roomData));
+  };
+
+  const onChange = (e: React.ChangeEvent<HTMLInputElement>): void => {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const files = Array.from((e.target as any).files);
+
+    imagesBase64.current = [];
+
+    files.forEach((file, idx) => {
+      const reader = new FileReader();
+
+      reader.onload = (): void => {
+        if (reader.readyState === 2) {
+          imagesBase64.current.push(reader.result as string);
+          if (idx === files.length - 1) {
+            setImages(imagesBase64.current);
+            return;
+          }
+        }
+      };
+
+      if (e.target.files) {
+        try {
+          reader.readAsDataURL(file as Blob);
+        } catch {}
+      }
+    });
   };
 
   return (
@@ -289,6 +323,29 @@ export default function RoomCreate(): JSX.Element {
                     <label className="form-check-label" htmlFor="roomCleaning_checkbox">
                       Room Cleaning
                     </label>
+                  </div>
+
+                  <div className="form-group mt-4">
+                    <label>Images</label>
+                    <div className="custom-file">
+                      <input
+                        type="file"
+                        name="room_images"
+                        className="custom-file-input"
+                        id="customFile"
+                        onChange={onChange}
+                        multiple
+                        disabled={loadingFromCreate}
+                      />
+                      <label className="custom-file-label" htmlFor="customFile">
+                        Choose Images
+                      </label>
+                    </div>
+
+                    {images.map((img) => (
+                      // eslint-disable-next-line @next/next/no-img-element
+                      <img src={img} key={img} alt="Images Preview" className="mt-3 mr-2" width="55" height="52" />
+                    ))}
                   </div>
 
                   <button type="submit" className="btn btn-block new-room-btn py-3" disabled={loadingFromCreate}>

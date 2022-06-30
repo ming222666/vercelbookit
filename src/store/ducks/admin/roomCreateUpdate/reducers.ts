@@ -52,6 +52,9 @@ const roomCreateUpdateReducer = (
         ...state,
         success: null,
       };
+    case RoomCreateActionType.ROOM_CREATE_RESET:
+    case RoomUpdateActionType.ROOM_UPDATE_RESET:
+      return initialState;
     default:
       return state;
   }
