@@ -103,7 +103,7 @@ export default function MyBookings(): JSX.Element {
       rows: [],
     };
 
-    bookings &&
+    bookings.current &&
       bookings.current.length > 0 &&
       bookings.current.forEach((booking) => {
         data.rows.push({
