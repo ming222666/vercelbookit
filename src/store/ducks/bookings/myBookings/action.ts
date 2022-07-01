@@ -14,7 +14,7 @@ export const myBookings =
         type: MyBookingsActionType.LOAD_MY_BOOKINGS_REQUEST,
       });
 
-      const { data } = await axios.get<{ user: string; bookings: IBookingExtended[] }>('/api/bookings/me');
+      const { data } = await axios.get<{ bookings: IBookingExtended[] }>('/api/bookings/me');
 
       return dispatch({
         type: MyBookingsActionType.LOAD_MY_BOOKINGS_SUCCESS,

@@ -2,7 +2,6 @@ import { MyBookingsAction, MyBookingsActionType } from './types';
 import { MyBookingsState } from './models/MyBookingsState';
 
 const initialState: MyBookingsState = {
-  user: '',
   bookings: [],
   error: null,
   loading: false,
@@ -28,7 +27,6 @@ const myBookingsReducer = (state: MyBookingsState = initialState, action: MyBook
     case MyBookingsActionType.LOAD_MY_BOOKINGS_SUCCESS:
       return {
         ...state,
-        user: action.payload.user,
         bookings: action.payload.bookings,
         error: null,
         loading: false,

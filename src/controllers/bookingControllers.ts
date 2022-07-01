@@ -115,7 +115,7 @@ const checkBookedDatesOfRoom = async (
 // Check bookings of current user   =>   /api/bookings/me
 const myBookings = async (
   req: NextApiRequest,
-  res: NextApiResponse<{ user: string; bookings: IBookingExtended[] } | IErrorDto>,
+  res: NextApiResponse<{ bookings: IBookingExtended[] } | IErrorDto>,
 ): Promise<void> => {
   await db.connect();
 
@@ -135,7 +135,7 @@ const myBookings = async (
   await db.disconnect();
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  res.status(200).send({ user: (req as any).user._id, bookings });
+  res.status(200).send({ bookings });
 };
 
 // Check booking details   =>   /api/bookings/:id

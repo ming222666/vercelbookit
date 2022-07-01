@@ -22,7 +22,7 @@ export interface LoadMyBookingsFailAction extends BaseAction {
 
 export interface LoadMyBookingsSuccessAction extends BaseAction {
   type: MyBookingsActionType.LOAD_MY_BOOKINGS_SUCCESS;
-  payload: { user: string; bookings: IBookingExtended[] };
+  payload: { bookings: IBookingExtended[] };
 }
 
 export interface ResetMyBookingsFailAction extends BaseAction {
