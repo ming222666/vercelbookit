@@ -141,7 +141,7 @@ export default function AdminRooms(): JSX.Element {
       rows: [],
     };
 
-    rooms &&
+    rooms.current &&
       rooms.current.length > 0 &&
       rooms.current.forEach((room) => {
         data.rows.push({
@@ -182,7 +182,7 @@ export default function AdminRooms(): JSX.Element {
     <>
       <div className="container container-fluid">
         <h1 className="my-5">
-          {`${rooms && rooms.current.length} Rooms`}
+          {`${rooms.current && rooms.current.length} Rooms`}
           {/* eslint-disable-next-line @next/next/no-html-link-for-pages */}
           <a
             className="mt-0 btn text-white float-right new-room-btn"
