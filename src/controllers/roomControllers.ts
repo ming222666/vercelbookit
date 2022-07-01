@@ -138,7 +138,7 @@ const updateRoom = async (req: RoomNextApiRequest, res: NextApiResponse<IRoomDto
   res.status(200).send(roomToUpdate);
 };
 
-// Delete room => /api/rooms/:id
+// Delete room => /api/admin/rooms/:id
 const deleteRoom = async (
   req: NextApiRequest,
   res: NextApiResponse<{ success: boolean } | IErrorDto>,

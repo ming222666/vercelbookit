@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState, useMemo, useCallback } from 'react';
-import Link from 'next/link';
+import { useRouter } from 'next/router';
 
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const { MDBDataTable } = require('mdbreact');
@@ -13,6 +13,8 @@ import useAppDispatch from '../../../hooks/useAppDispatch';
 import { IBookingExtended } from '../../../controllers/interfaces';
 import { AdminBookingsActionType } from '../../../store/ducks/admin/bookings/types';
 import { adminBookings } from '../../../store/ducks/admin/bookings/action';
+import { BookingDeleteActionType } from '../../../store/ducks/admin/bookingDelete/types';
+import { bookingDelete } from '../../../store/ducks/admin/bookingDelete/action';
 import Loader from '../../../components/Layout/Loader';
 
 interface IRow {
@@ -39,17 +41,28 @@ export default function AdminBookings(): JSX.Element {
   const isSettled = useRef(false);
   const bookings = useRef<IBookingExtended[]>([]);
 
+  const router = useRouter();
+
   const {
     loading,
     bookings: bookingsFromState,
     error,
     success,
   } = useSelector((state: AppState) => state.admin.bookings);
+  const {
+    loading: deleteLoading,
+    error: deleteError,
+    success: deleteSuccess,
+  } = useSelector((state: AppState) => state.admin.bookingDelete);
 
   const dispatch = useAppDispatch();
 
   useEffect(() => {
     dispatch(adminBookings());
+
+    return (): void => {
+      dispatch({ type: BookingDeleteActionType.BOOKING_DELETE_RESET });
+    };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -70,6 +83,37 @@ export default function AdminBookings(): JSX.Element {
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [error]);
+
+  useEffect((): void => {
+    if (deleteSuccess) {
+      dispatch({ type: BookingDeleteActionType.BOOKING_DELETE_RESET });
+      dispatch(adminBookings());
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [deleteSuccess]);
+
+  useEffect((): void => {
+    if (deleteError) {
+      toast.error(deleteError.errormsg);
+      dispatch({ type: BookingDeleteActionType.BOOKING_DELETE_RESET_FAIL });
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [deleteError]);
+
+  const onViewBookingHandler = (e: React.SyntheticEvent<Element, Event>): void => {
+    e.preventDefault();
+    if (deleteLoading) {
+      return;
+    }
+    router.push(`/bookings/${e.currentTarget.id}`);
+  };
+
+  const deleteBookingHandler = (e: React.SyntheticEvent<Element, Event>): void => {
+    // targetId format... 'delete' + booking._id
+    const targetId = e.currentTarget.id;
+    const bookingId = targetId.substring(6);
+    dispatch(bookingDelete(bookingId));
+  };
 
   const memoizedDataForTable = useMemo((): IData => {
     const data: IData = {
@@ -113,11 +157,15 @@ export default function AdminBookings(): JSX.Element {
           amount: `$${booking.amountPaid}`,
           actions: (
             <>
-              <Link href={`/bookings/${booking._id}`}>
-                <a className="btn btn-primary">
-                  <i className="fa fa-eye"></i>
-                </a>
-              </Link>
+              <a
+                className="btn btn-primary"
+                style={{ opacity: deleteLoading ? 0.5 : 1 }}
+                href={`/bookings/${booking._id}`}
+                id={booking._id}
+                onClick={onViewBookingHandler}
+              >
+                <i className="fa fa-eye"></i>
+              </a>
 
               <a
                 className="btn btn-success mx-2"
@@ -128,6 +176,15 @@ export default function AdminBookings(): JSX.Element {
               >
                 <i className="fa fa-download"></i>
               </a>
+
+              <button
+                className="btn btn-danger mx-2"
+                disabled={deleteLoading}
+                id={'delete' + booking._id}
+                onClick={deleteBookingHandler}
+              >
+                <i className="fa fa-trash"></i>
+              </button>
             </>
           ),
         });
@@ -242,7 +299,7 @@ export default function AdminBookings(): JSX.Element {
               }}
             >
               <View style={{ width: '60%' }}>
-                <Text style={{ fontSize: 12 }}>Room</Text>
+                <Text style={{ fontSize: 12 }}>Booking</Text>
               </View>
               <View style={{ width: '40%', display: 'flex', flexDirection: 'row' }}>
                 <View style={{ flex: '1 1 0', textAlign: 'right' }}>
@@ -372,6 +429,24 @@ export default function AdminBookings(): JSX.Element {
 
       <div ref={invoiceDivRef}></div>
       {bookingIdToPreviewInvoice && <div style={{ marginTop: 60 }}>{invoiceRef.current}</div>}
+
+      {deleteLoading && (
+        <div
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            position: 'fixed',
+            top: 0,
+            left: 0,
+            width: '100%',
+            height: '100%',
+            cursor: 'wait',
+          }}
+        >
+          <Loader />
+        </div>
+      )}
     </>
   );
 }

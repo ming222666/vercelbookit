@@ -161,6 +161,27 @@ const getBookingDetails = async (
   res.status(200).send(booking);
 };
 
+// Delete booking => /api/admin/bookings/:id
+const deleteBooking = async (
+  req: NextApiRequest,
+  res: NextApiResponse<{ success: boolean } | IErrorDto>,
+): Promise<void> => {
+  await db.connect();
+  const booking = await Booking.findById(req.query.id);
+  if (!booking) {
+    await db.disconnect();
+    res.status(404).json({
+      errormsg: 'Booking not found with this ID',
+      status: 404,
+    });
+    return;
+  }
+
+  await booking.remove();
+  await db.disconnect();
+  res.status(200).json({ success: true });
+};
+
 // Get all bookings (admin)   =>   /api/admin/bookings
 const adminBookings = async (
   req: NextApiRequest,
@@ -193,5 +214,6 @@ export {
   checkBookedDatesOfRoom,
   myBookings,
   getBookingDetails,
+  deleteBooking,
   adminBookings,
 };
