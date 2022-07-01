@@ -235,7 +235,7 @@ const checkReviewAvailability = async (req: NextApiRequest, res: NextApiResponse
 // Get all rooms - ADMIN   =>   /api/admin/rooms
 const allAdminRooms = async (req: NextApiRequest, res: NextApiResponse<IRoomDto[]>): Promise<void> => {
   await db.connect();
-  const sortBy = req.query.sort ? { updatedAt: -1 } : { name: 1 };
+  const sortBy = req.query.updated ? { updatedAt: -1 } : { name: 1 };
   const rooms: IRoomDto[] = await Room.find().sort(sortBy).lean();
   convertDocsToObj(rooms);
   await db.disconnect();

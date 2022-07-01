@@ -40,7 +40,7 @@ export default function AdminRooms(): JSX.Element {
 
   const router = useRouter();
 
-  const { sort } = router.query;
+  const { updated } = router.query;
 
   const { loading, rooms: roomsFromState, error, success } = useSelector((state: AppState) => state.admin.rooms);
   const {
@@ -52,7 +52,7 @@ export default function AdminRooms(): JSX.Element {
   const dispatch = useAppDispatch();
 
   useEffect(() => {
-    dispatch(getRooms(sort ? 'yes' : ''));
+    dispatch(getRooms(updated ? 'yes' : ''));
 
     return (): void => {
       dispatch({ type: RoomDeleteActionType.ROOM_DELETE_RESET });

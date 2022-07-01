@@ -8,14 +8,14 @@ import { getError } from '../../../../utils/getAxiosError';
 
 // Get all rooms (admin)
 export const getRooms =
-  (sort = '') =>
+  (updated = '') =>
   async (dispatch: ThunkDispatch<AdminRoomsState, undefined, AdminRoomsAction>): Promise<AdminRoomsAction> => {
     try {
       dispatch({
         type: AdminRoomsActionType.ADMIN_ROOMS_REQUEST,
       });
 
-      const link = `/api/admin/rooms${sort ? '?sort=yes' : ''}`;
+      const link = `/api/admin/rooms${updated ? '?updated=yes' : ''}`;
 
       const { data } = await axios.get<IRoomDto[]>(link);
 
