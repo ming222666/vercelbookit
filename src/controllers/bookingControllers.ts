@@ -112,7 +112,7 @@ const checkBookedDatesOfRoom = async (
   res.status(200).send({ roomId: roomId as string, dates: bookedDates });
 };
 
-// Check bookings of current user   =>   /api/bookings/me
+// Get bookings of current user   =>   /api/bookings/me
 const myBookings = async (
   req: NextApiRequest,
   res: NextApiResponse<{ bookings: IBookingExtended[] } | IErrorDto>,
@@ -161,4 +161,37 @@ const getBookingDetails = async (
   res.status(200).send(booking);
 };
 
-export { newBooking, checkRoomBookingAvailability, checkBookedDatesOfRoom, myBookings, getBookingDetails };
+// Get all bookings (admin)   =>   /api/admin/bookings
+const adminBookings = async (
+  req: NextApiRequest,
+  res: NextApiResponse<{ bookings: IBookingExtended[] } | IErrorDto>,
+): Promise<void> => {
+  await db.connect();
+
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const bookings: IBookingExtended[] = await Booking.find({})
+    .populate({
+      path: 'room',
+      select: 'name pricePerNight images',
+    })
+    .populate({
+      path: 'user',
+      select: 'name email',
+    })
+    .sort({ checkInDate: 1 })
+    .lean();
+
+  await db.disconnect();
+
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  res.status(200).send({ bookings });
+};
+
+export {
+  newBooking,
+  checkRoomBookingAvailability,
+  checkBookedDatesOfRoom,
+  myBookings,
+  getBookingDetails,
+  adminBookings,
+};
