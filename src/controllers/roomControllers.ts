@@ -139,7 +139,10 @@ const updateRoom = async (req: RoomNextApiRequest, res: NextApiResponse<IRoomDto
 };
 
 // Delete room => /api/rooms/:id
-const deleteRoom = async (req: NextApiRequest, res: NextApiResponse<{ status: number } | IErrorDto>): Promise<void> => {
+const deleteRoom = async (
+  req: NextApiRequest,
+  res: NextApiResponse<{ success: boolean } | IErrorDto>,
+): Promise<void> => {
   await db.connect();
   const room = await Room.findById(req.query.id);
   if (!room) {
@@ -150,9 +153,15 @@ const deleteRoom = async (req: NextApiRequest, res: NextApiResponse<{ status: nu
     });
     return;
   }
+
+  // Delete images associated with the room
+  for (let i = 0; i < room.images.length; i++) {
+    await cloudinary.uploader.destroy(room.images[i].public_id);
+  }
+
   await room.remove();
   await db.disconnect();
-  res.status(200).json({ status: 200 });
+  res.status(200).json({ success: true });
 };
 
 interface IReviewDto {
