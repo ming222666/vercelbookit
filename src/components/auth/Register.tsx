@@ -95,7 +95,9 @@ export default function Register(): JSX.Element {
       };
 
       if (e.target.files) {
-        reader.readAsDataURL(e.target.files[0]);
+        try {
+          reader.readAsDataURL(e.target.files[0]);
+        } catch {}
       }
     } else {
       setUser({ ...user, [e.target.name]: e.target.value });
@@ -162,6 +164,7 @@ export default function Register(): JSX.Element {
                     id="customFile"
                     accept="images/*"
                     onChange={onChange}
+                    disabled={loading}
                   />
                   <label className="custom-file-label" htmlFor="customFile">
                     Choose Avatar

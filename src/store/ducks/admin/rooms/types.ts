@@ -6,8 +6,8 @@ export enum AdminRoomsActionType {
   ADMIN_ROOMS_FAIL = 'adminRooms/ADMIN_ROOMS_FAIL',
   ADMIN_ROOMS_SUCCESS = 'adminRooms/ADMIN_ROOMS_SUCCESS',
 
-  ADMIN_ROOMS_RESET_FAIL = 'myBookings/ADMIN_ROOMS_RESET_FAIL',
-  ADMIN_ROOMS_RESET_SUCCESS = 'myBookings/ADMIN_ROOMS_RESET_SUCCESS',
+  ADMIN_ROOMS_RESET_FAIL = 'adminRooms/ADMIN_ROOMS_RESET_FAIL',
+  ADMIN_ROOMS_RESET_SUCCESS = 'adminRooms/ADMIN_ROOMS_RESET_SUCCESS',
 }
 
 export interface AdminRoomsRequestAction extends BaseAction {

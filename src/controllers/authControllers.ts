@@ -6,6 +6,7 @@ import { HydratedDocument } from 'mongoose';
 import db from '../db/db';
 import { IUserDto, IErrorDto } from '../db/interfaces';
 import User from '../db/models/User';
+import convertDocsToObj from '../utils/convertDocsToObj';
 import { IWithBodyNextApiRequest } from './interfaces';
 import { IUserFormData } from './interfaces';
 
@@ -136,4 +137,99 @@ const updateProfile = async (req: UserNextApiRequest, res: NextApiResponse<IUser
   });
 };
 
-export { registerUser, currentUserProfile, updateProfile };
+// Update user details => /api/admin/users/:id
+const updateUser = async (
+  req: NextApiRequest,
+  res: NextApiResponse<{ _id: string; name: string; email: string; role: string | undefined } | IErrorDto>,
+): Promise<void> => {
+  await db.connect();
+  const user = await User.findById(req.query.id);
+  if (!user) {
+    await db.disconnect();
+    res.status(404).json({
+      errormsg: 'User not found with this ID',
+      status: 404,
+    });
+    return;
+  }
+
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const _id = (req as any).user._id;
+
+  const changesToUpdate = req.body;
+  changesToUpdate['updatedAt'] = Date.now();
+
+  const userToUpdate: IUserDto = await User.findByIdAndUpdate(req.query.id, changesToUpdate, {
+    new: true,
+    runValidators: true,
+    useFindAndModify: false,
+  }).lean();
+  await db.disconnect();
+  res.status(200).send({ _id, name: userToUpdate.name, email: userToUpdate.email, role: userToUpdate.role });
+};
+
+// Delete user => /api/admin/users/:id
+const deleteUser = async (
+  req: NextApiRequest,
+  res: NextApiResponse<{ success: boolean } | IErrorDto>,
+): Promise<void> => {
+  await db.connect();
+  const user = await User.findById(req.query.id);
+  if (!user) {
+    await db.disconnect();
+    res.status(404).json({
+      errormsg: 'User not found with this ID',
+      status: 404,
+    });
+    return;
+  }
+
+  await user.remove();
+  await db.disconnect();
+  res.status(200).json({ success: true });
+};
+
+// Get all users - ADMIN   =>   /api/admin/users
+const allAdminUsers = async (req: NextApiRequest, res: NextApiResponse<IUserDto[]>): Promise<void> => {
+  await db.connect();
+  const sortBy = req.query.updated ? { updatedAt: -1 } : { name: 1 };
+  const users: IUserDto[] = await User.find().sort(sortBy).lean();
+  convertDocsToObj(users);
+  await db.disconnect();
+
+  res.status(200).send(users);
+};
+
+// Get user details => /api/admin/users/:id
+const userDetails = async (
+  req: NextApiRequest,
+  res: NextApiResponse<
+    | {
+        _id: string;
+        name: string;
+        email: string;
+        role: string;
+      }
+    | IErrorDto
+  >,
+): Promise<void> => {
+  await db.connect();
+  const user: IUserDto = await User.findById(req.query.id).lean();
+  if (!user) {
+    await db.disconnect();
+    res.status(404).json({
+      errormsg: 'User not found with this ID',
+      status: 404,
+    });
+    return;
+  }
+  await db.disconnect();
+  res.status(200).send({
+    _id: user._id ? user._id.toString() : '',
+    name: user.name,
+    email: user.email,
+    role: user.role ? user.role : '',
+  });
+};
+
+export { registerUser, currentUserProfile, updateProfile, updateUser, deleteUser, userDetails, allAdminUsers };

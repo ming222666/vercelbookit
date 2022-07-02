@@ -83,7 +83,7 @@ const getSingleRoom = async (req: NextApiRequest, res: NextApiResponse<IRoomDto 
   res.status(200).send(room);
 };
 
-// Update room details => /api/rooms/:id
+// Update room details => /api/admin/rooms/:id
 const updateRoom = async (req: RoomNextApiRequest, res: NextApiResponse<IRoomDto | IErrorDto>): Promise<void> => {
   await db.connect();
   const room = await Room.findById(req.query.id);
