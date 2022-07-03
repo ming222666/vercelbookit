@@ -10,7 +10,7 @@ export function RoomItem(props: { room: IRoomDto }): JSX.Element {
     <div className="col-sm-12 col-md-6 col-lg-3 my-3">
       <div className="card p-2">
         {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img className="card-img-top mx-auto" src={room.images[0].url} height={170} alt="Room" />
+        <img className="card-img-top mx-auto" src={room.images ? room.images[0].url : ''} height={170} alt="Room" />
         <div className="card-body d-flex flex-column">
           <h5 className="card-title">
             <Link href={`/rooms/${room._id}`}>

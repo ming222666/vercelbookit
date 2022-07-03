@@ -9,7 +9,7 @@ import { toast } from 'react-toastify';
 
 import { AppState } from '../../../store';
 import useAppDispatch from '../../../hooks/useAppDispatch';
-import { IUserDto } from '../../../db/interfaces';
+import { UserDetailsInfo } from '../../../store/ducks/admin/userDetails/models/UserDetailsInfo';
 import { AdminUsersActionType } from '../../../store/ducks/admin/users/types';
 import { getUsers } from '../../../store/ducks/admin/users/action';
 import { UserDeleteActionType } from '../../../store/ducks/admin/userDelete/types';
@@ -36,7 +36,7 @@ export const MemoizedMDBDataTable = React.memo(MDBDataTableWrapper);
 
 export default function AdminUsers(): JSX.Element {
   const isSettled = useRef(false);
-  const users = useRef<IUserDto[]>([]);
+  const users = useRef<UserDetailsInfo[]>([]);
 
   const router = useRouter();
 
