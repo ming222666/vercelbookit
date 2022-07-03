@@ -39,6 +39,7 @@ export interface IRoomDto {
     name: string;
     rating: number;
     comment: string;
+    updatedAt?: number;
   }[];
   user?: string;
   createdAt?: number;

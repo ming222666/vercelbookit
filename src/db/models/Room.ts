@@ -85,6 +85,14 @@ const roomSchema = new mongoose.Schema({
       name: { type: String, required: true },
       rating: { type: Number, required: true },
       comment: { type: String, required: true, trim: true },
+      createdAt: {
+        type: Number,
+        default: Date.now,
+      },
+      updatedAt: {
+        type: Number,
+        default: Date.now,
+      },
     },
   ],
   user: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: false }, // required: true

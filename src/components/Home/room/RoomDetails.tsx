@@ -155,7 +155,7 @@ export function RoomDetails({ room, error }: Props): JSX.Element {
             <div
               className="rating-inner"
               style={{
-                width: room ? `${(room.rating / 5) * 100}%` : undefined,
+                width: room && room.rating ? `${(room.rating / 5) * 100}%` : undefined,
               }}
             ></div>
           </div>
@@ -163,7 +163,7 @@ export function RoomDetails({ room, error }: Props): JSX.Element {
         </div>
         <Carousel>
           {room &&
-            room.images.map((image) => (
+            room.images?.map((image) => (
               <Carousel.Item key={image.public_id}>
                 <div style={{ width: '100%', height: 440 }}>
                   <Image className="d-block m-auto" src={image.url} alt={room.name} layout="fill" />

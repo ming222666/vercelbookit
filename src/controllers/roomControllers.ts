@@ -171,6 +171,7 @@ interface IReviewDto {
   roomId: string;
   rating: number;
   comment: string;
+  updatedAt?: number;
 }
 
 // Create a new room review => /api/reviews
@@ -200,6 +201,7 @@ const createRoomReview = async (req: NextApiRequest, res: NextApiResponse): Prom
       if (r.user?.toString() === user) {
         r.comment = comment;
         r.rating = rating;
+        r.updatedAt = Date.now();
       }
     });
   } else {
