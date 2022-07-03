@@ -145,6 +145,10 @@ const getBookingDetails = async (
 ): Promise<void> => {
   await db.connect();
 
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const user = (req as any).user;
+  const isAdmin = user.role === 'admin' ? true : false;
+
   const booking: IBookingExtended = await Booking.findById(req.query.id)
     .populate({
       path: 'room',
@@ -157,6 +161,22 @@ const getBookingDetails = async (
     .lean();
 
   await db.disconnect();
+
+  if (isAdmin) {
+    res.status(200).send(booking);
+    return;
+  }
+
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const userId = user._id;
+
+  if (booking.user._id.toString() !== userId) {
+    res.status(404).json({
+      errormsg: 'Booking not found',
+      status: 404,
+    });
+    return;
+  }
 
   res.status(200).send(booking);
 };

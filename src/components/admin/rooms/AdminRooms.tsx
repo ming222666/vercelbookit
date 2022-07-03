@@ -42,6 +42,7 @@ export default function AdminRooms(): JSX.Element {
 
   const { updated } = router.query;
 
+  const { user } = useSelector((state: AppState) => state.auth);
   const { loading, rooms: roomsFromState, error, success } = useSelector((state: AppState) => state.admin.rooms);
   const {
     loading: deleteLoading,
@@ -183,21 +184,23 @@ export default function AdminRooms(): JSX.Element {
       <div className="container container-fluid">
         <h1 className="my-5">
           {`${rooms.current && rooms.current.length} Rooms`}
-          {/* eslint-disable-next-line @next/next/no-html-link-for-pages */}
-          <a
-            className="mt-0 btn text-white float-right new-room-btn"
-            style={{ opacity: deleteLoading ? 0.5 : 1 }}
-            href="/admin/room/new"
-            onClick={(e): void => {
-              e.preventDefault();
-              if (deleteLoading) {
-                return;
-              }
-              router.push('/admin/room/new');
-            }}
-          >
-            Create Room
-          </a>
+          {user && user.role === 'admin' && (
+            // eslint-disable-next-line @next/next/no-html-link-for-pages
+            <a
+              className="mt-0 btn text-white float-right new-room-btn"
+              style={{ opacity: deleteLoading ? 0.5 : 1 }}
+              href="/admin/room/new"
+              onClick={(e): void => {
+                e.preventDefault();
+                if (deleteLoading) {
+                  return;
+                }
+                router.push('/admin/room/new');
+              }}
+            >
+              Create Room
+            </a>
+          )}
         </h1>
 
         {loading || !isSettled.current ? <Loader /> : <MemoizedMDBDataTable data={memoizedDataForTable} />}
