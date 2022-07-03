@@ -3,7 +3,7 @@ import axios from 'axios';
 
 import { UserDetailsAction, UserDetailsActionType } from './types';
 import { UserDetailsState } from './models/UserDetailsState';
-import { UserUpdateInfo } from '../userUpdate/models/UserUpdateInfo';
+import { UserDetailsInfo } from './models/UserDetailsInfo';
 import { getError } from '../../../../utils/getAxiosError';
 
 // Get user details
@@ -15,7 +15,7 @@ export const getUserDetails =
         type: UserDetailsActionType.USER_DETAILS_REQUEST,
       });
 
-      const { data } = await axios.get<UserUpdateInfo>(`/api/admin/users/${userId}`);
+      const { data } = await axios.get<UserDetailsInfo>(`/api/admin/users/${userId}`);
 
       return dispatch({
         type: UserDetailsActionType.USER_DETAILS_SUCCESS,

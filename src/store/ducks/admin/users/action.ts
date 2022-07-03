@@ -3,8 +3,8 @@ import axios from 'axios';
 
 import { AdminUsersAction, AdminUsersActionType } from './types';
 import { AdminUsersState } from './models/AdminUsersState';
-import { IUserDto } from '../../../../db/interfaces';
 import { getError } from '../../../../utils/getAxiosError';
+import { UserDetailsInfo } from '../userDetails/models/UserDetailsInfo';
 
 // Get all users (admin)
 export const getUsers =
@@ -17,7 +17,7 @@ export const getUsers =
 
       const link = `/api/admin/users${updated ? '?updated=yes' : ''}`;
 
-      const { data } = await axios.get<IUserDto[]>(link);
+      const { data } = await axios.get<UserDetailsInfo[]>(link);
 
       return dispatch({
         type: AdminUsersActionType.ADMIN_USERS_SUCCESS,

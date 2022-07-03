@@ -1,5 +1,6 @@
 import { BaseAction } from '../../../BaseAction';
-import { IUserDto, IErrorDto } from '../../../../db/interfaces';
+import { IErrorDto } from '../../../../db/interfaces';
+import { UserDetailsInfo } from '../userDetails/models/UserDetailsInfo';
 
 export enum AdminUsersActionType {
   ADMIN_USERS_REQUEST = 'adminUsers/ADMIN_USERS_REQUEST',
@@ -21,7 +22,7 @@ export interface AdminUsersFailAction extends BaseAction {
 
 export interface AdminUsersSuccessAction extends BaseAction {
   type: AdminUsersActionType.ADMIN_USERS_SUCCESS;
-  payload: IUserDto[];
+  payload: UserDetailsInfo[];
 }
 
 export interface AdminUsersResetFailAction extends BaseAction {

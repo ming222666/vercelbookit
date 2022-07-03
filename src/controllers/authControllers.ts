@@ -190,10 +190,25 @@ const deleteUser = async (
 };
 
 // Get all users - ADMIN   =>   /api/admin/users
-const allAdminUsers = async (req: NextApiRequest, res: NextApiResponse<IUserDto[]>): Promise<void> => {
+const allAdminUsers = async (
+  req: NextApiRequest,
+  res: NextApiResponse<
+    {
+      _id: string;
+      name: string;
+      email: string;
+      role: string;
+    }[]
+  >,
+): Promise<void> => {
   await db.connect();
   const sortBy = req.query.updated ? { updatedAt: -1 } : { name: 1 };
-  const users: IUserDto[] = await User.find().sort(sortBy).lean();
+  const users: {
+    _id: string;
+    name: string;
+    email: string;
+    role: string;
+  }[] = await User.find().select('name email role').sort(sortBy).lean();
   convertDocsToObj(users);
   await db.disconnect();
 

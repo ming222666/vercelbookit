@@ -1,6 +1,6 @@
 import { BaseAction } from '../../../BaseAction';
 import { IErrorDto } from '../../../../db/interfaces';
-import { UserUpdateInfo } from '../userUpdate/models/UserUpdateInfo';
+import { UserDetailsInfo } from './models/UserDetailsInfo';
 
 export enum UserDetailsActionType {
   USER_DETAILS_REQUEST = 'userDetails/USER_DETAILS_REQUEST',
@@ -22,7 +22,7 @@ export interface GetUserDetailsFailAction extends BaseAction {
 
 export interface GetUserDetailsSuccessAction extends BaseAction {
   type: UserDetailsActionType.USER_DETAILS_SUCCESS;
-  payload: UserUpdateInfo;
+  payload: UserDetailsInfo;
 }
 
 export interface GetUserDetailsResetFailAction extends BaseAction {

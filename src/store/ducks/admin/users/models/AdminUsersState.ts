@@ -1,5 +1,6 @@
-import { IUserDto, ILES } from '../../../../../db/interfaces';
+import { ILES } from '../../../../../db/interfaces';
+import { UserDetailsInfo } from '../../userDetails/models/UserDetailsInfo';
 
 export interface AdminUsersState extends ILES {
-  users: IUserDto[];
+  users: UserDetailsInfo[];
 }
