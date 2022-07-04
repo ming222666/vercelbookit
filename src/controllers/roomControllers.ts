@@ -9,6 +9,7 @@ import Booking from '../db/models/Booking';
 import APIFeatures from '../utils/apiFeatures';
 import convertDocsToObj from '../utils/convertDocsToObj';
 import { IWithBodyNextApiRequest } from './interfaces';
+import { ReviewInfo } from '../store/ducks/admin/reviews/models/ReviewInfo';
 
 type RoomNextApiRequest = IWithBodyNextApiRequest<IRoomWithImagesBase64Dto>;
 
@@ -245,6 +246,73 @@ const allAdminRooms = async (req: NextApiRequest, res: NextApiResponse<IRoomDto[
   res.status(200).send(rooms);
 };
 
+interface ReviewInfoExtended extends ReviewInfo {
+  user?: string;
+  createdAt?: number;
+}
+
+// Get all reviews - ADMIN   =>   /api/admin/reviews?roomId=???
+const allReviews = async (req: NextApiRequest, res: NextApiResponse<ReviewInfo[]>): Promise<void> => {
+  await db.connect();
+  const room = await Room.findById(req.query.roomId).select('reviews').lean();
+  convertDocsToObj(room.reviews);
+  await db.disconnect();
+
+  const reviews: ReviewInfoExtended[] = room.reviews;
+
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  reviews.forEach((review) => {
+    delete review.user;
+    delete review.createdAt;
+  });
+
+  convertDocsToObj(reviews);
+
+  res.status(200).send(reviews);
+};
+
+// Delete review => /api/admin/reviews/:id?roomId=???
+const deleteReview = async (
+  req: NextApiRequest,
+  res: NextApiResponse<{ success: boolean } | IErrorDto>,
+): Promise<void> => {
+  await db.connect();
+  const room = await Room.findById(req.query.roomId);
+  if (!room) {
+    await db.disconnect();
+    res.status(404).json({
+      errormsg: 'Room not found with this ID',
+      status: 404,
+    });
+    return;
+  }
+
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const reviews = room.reviews.filter((review: any) => review._id.toString() !== req.query.id.toString());
+
+  const numOfReviews = reviews.length;
+
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const ratings = room.reviews.reduce((acc: number, item: any) => item.rating + acc, 0) / reviews.length;
+
+  await Room.findByIdAndUpdate(
+    req.query.roomId,
+    {
+      reviews,
+      ratings,
+      numOfReviews,
+    },
+    {
+      new: true,
+      runValidators: true,
+      useFindAndModify: false,
+    },
+  );
+
+  await db.disconnect();
+  res.status(200).json({ success: true });
+};
+
 export {
   allRooms,
   newRoom,
@@ -254,4 +322,6 @@ export {
   createRoomReview,
   checkReviewAvailability,
   allAdminRooms,
+  allReviews,
+  deleteReview,
 };
