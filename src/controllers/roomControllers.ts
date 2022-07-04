@@ -267,7 +267,6 @@ const allReviews = async (req: NextApiRequest, res: NextApiResponse<ReviewInfo[]
   });
 
   convertDocsToObj(reviews);
-
   res.status(200).send(reviews);
 };
 

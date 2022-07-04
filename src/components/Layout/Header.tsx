@@ -194,9 +194,9 @@ export function Header(): JSX.Element {
                       <a className="dropdown-item">Users</a>
                     </Link>
 
-                    {/* <Link href="/admin/reviews">
+                    <Link href="/admin/reviews">
                       <a className="dropdown-item">Reviews</a>
-                    </Link> */}
+                    </Link>
 
                     <hr />
                   </>
