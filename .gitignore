@@ -29,6 +29,7 @@ yarn-error.log*
 
 # local env files
 .env*.local
+.env.local-ubuntu-192.168.1.72
 
 # vercel
 .vercel
@@ -37,4 +38,5 @@ yarn-error.log*
 *.tsbuildinfo
 
 DO-NOT-DEL-why-sticking-to-react18-not-17.txt
+/ubuntu_bookit_stuff
 /misc
