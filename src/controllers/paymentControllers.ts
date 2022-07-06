@@ -1,9 +1,10 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
 
-import absoluteUrl from 'next-absolute-url';
 import getRawBody from 'raw-body';
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
+// eslint-disable-next-line @typescript-eslint/no-var-requires
+const url = require('url');
 
 import db from '../db/db';
 import { IErrorDto } from '../db/interfaces';
@@ -22,14 +23,15 @@ const stripeCheckoutSession = async (req: NextApiRequest, res: NextApiResponse):
 
   const { checkInDate, checkOutDate, daysOfStay } = req.query;
 
-  // Get origin
-  const { origin } = absoluteUrl(req);
+  const posReferer = req.rawHeaders.findIndex((el) => el === 'Referer');
+  // e.g. http://www.ming-bookit.com/rooms/62c4f68447cd36c781bbf1f0
+  const urlObject = url.parse(req.rawHeaders[posReferer + 1], true);
 
   // Get stripe checkout session
   const session = await stripe.checkout.sessions.create({
     payment_method_types: ['card'],
-    success_url: `${origin}/bookings/me`,
-    cancel_url: `${origin}/rooms/${room._id}`,
+    success_url: `${urlObject.protocol}//${urlObject.host}/bookings/me`,
+    cancel_url: `${urlObject.protocol}//${urlObject.host}/rooms/${room._id}`,
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     customer_email: (req as any).user.email,
     client_reference_id: req.query.roomId,

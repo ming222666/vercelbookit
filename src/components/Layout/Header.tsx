@@ -139,10 +139,11 @@ export function Header(): JSX.Element {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  const logoutHandler = (): void => {
-    signOut({
-      callbackUrl: '/',
+  const logoutHandler = async (): Promise<void> => {
+    await signOut({
+      redirect: false,
     });
+    window.location.href = '/';
   };
 
   return (
