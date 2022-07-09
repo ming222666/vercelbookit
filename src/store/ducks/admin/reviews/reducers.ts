@@ -3,6 +3,7 @@ import { ReviewsState } from './models/ReviewsState';
 
 const initialState: ReviewsState = {
   reviews: [],
+  roomId: '',
   error: null,
   loading: false,
   success: null,
@@ -25,7 +26,7 @@ const reviewsReducer = (state: ReviewsState = initialState, action: ReviewsActio
         success: null,
       };
     case ReviewsActionType.REVIEWS_SUCCESS:
-      const reviews = action.payload;
+      const reviews = action.payload.reviews;
 
       if (reviews.length > 1) {
         reviews.sort((a, b) => {
@@ -43,7 +44,8 @@ const reviewsReducer = (state: ReviewsState = initialState, action: ReviewsActio
 
       return {
         ...state,
-        reviews: action.payload,
+        reviews: action.payload.reviews,
+        roomId: action.payload.roomId,
         error: null,
         loading: false,
         success: true,

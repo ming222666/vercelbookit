@@ -21,7 +21,7 @@ export const getReviews =
 
       return dispatch({
         type: ReviewsActionType.REVIEWS_SUCCESS,
-        payload: data,
+        payload: { reviews: data, roomId },
       });
     } catch (error) {
       const err = getError(error);

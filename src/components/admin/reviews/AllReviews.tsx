@@ -40,7 +40,13 @@ export default function AllReviews(): JSX.Element {
   const isSettled = useRef(false);
   const reviews = useRef<ReviewInfo[]>([]);
 
-  const { loading, reviews: reviewsFromState, error, success } = useSelector((state: AppState) => state.admin.reviews);
+  const {
+    loading,
+    reviews: reviewsFromState,
+    error,
+    success,
+    roomId: roomIdFromState,
+  } = useSelector((state: AppState) => state.admin.reviews);
   const {
     loading: deleteLoading,
     error: deleteError,
@@ -49,9 +55,9 @@ export default function AllReviews(): JSX.Element {
 
   const dispatch = useAppDispatch();
 
-  const roomIdRef = useRef('');
+  const roomInputValueRef = useRef('');
   const roomIdLabel = useRef('');
-  const [roomId, setRoomId] = useState('');
+  const [roomValueToSubmit, setRoomValueToSubmit] = useState('');
 
   useEffect(() => {
     return (): void => {
@@ -61,15 +67,15 @@ export default function AllReviews(): JSX.Element {
   }, []);
 
   useEffect(() => {
-    if (roomId) dispatch(getReviews(roomId));
+    if (roomValueToSubmit) dispatch(getReviews(roomValueToSubmit));
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [roomId]);
+  }, [roomValueToSubmit]);
 
   useEffect((): void => {
     if (success) {
       isSettled.current = true;
       reviews.current = reviewsFromState;
-      roomIdLabel.current = roomIdRef.current;
+      roomIdLabel.current = roomIdFromState;
       dispatch({ type: ReviewsActionType.REVIEWS_RESET_SUCCESS });
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -87,7 +93,7 @@ export default function AllReviews(): JSX.Element {
   useEffect((): void => {
     if (deleteSuccess) {
       dispatch({ type: ReviewDeleteActionType.REVIEW_DELETE_RESET });
-      dispatch(getReviews(roomId));
+      dispatch(getReviews(roomIdLabel.current.trim()));
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [deleteSuccess]);
@@ -104,7 +110,7 @@ export default function AllReviews(): JSX.Element {
     // targetId format... 'delete' + review._id
     const targetId = e.currentTarget.id;
     const reviewId = targetId.substring(6);
-    dispatch(reviewDelete(roomId, reviewId));
+    dispatch(reviewDelete(roomIdLabel.current.trim(), reviewId));
   };
 
   const memoizedDataForTable = useMemo((): IData => {
@@ -178,7 +184,7 @@ export default function AllReviews(): JSX.Element {
             <form
               onSubmit={(e): void => {
                 e.preventDefault();
-                if (roomIdRef.current.trim()) setRoomId(roomIdRef.current.trim());
+                if (roomInputValueRef.current.trim()) setRoomValueToSubmit(roomInputValueRef.current.trim());
               }}
             >
               <div className="form-group" style={{ display: 'flex', alignItems: 'center' }}>
@@ -191,7 +197,7 @@ export default function AllReviews(): JSX.Element {
                   className="form-control"
                   disabled={loading || deleteLoading}
                   onChange={(e): void => {
-                    roomIdRef.current = e.target.value;
+                    roomInputValueRef.current = e.target.value;
                   }}
                 />
                 <button type="submit" className="btn btn-success ml-1" disabled={loading || deleteLoading}>

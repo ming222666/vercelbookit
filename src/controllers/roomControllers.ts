@@ -291,14 +291,17 @@ const deleteReview = async (
 
   const numOfReviews = reviews.length;
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const ratings = room.reviews.reduce((acc: number, item: any) => item.rating + acc, 0) / reviews.length;
+  const summ =
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    reviews.reduce((acc: number, item: any) => item.rating + acc, 0);
+
+  const ratings = numOfReviews > 0 ? summ / numOfReviews : 0;
 
   await Room.findByIdAndUpdate(
     req.query.roomId,
     {
       reviews,
-      ratings,
+      rating: ratings,
       numOfReviews,
     },
     {

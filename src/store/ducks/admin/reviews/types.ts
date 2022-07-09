@@ -22,7 +22,7 @@ export interface ReviewsFailAction extends BaseAction {
 
 export interface ReviewsSuccessAction extends BaseAction {
   type: ReviewsActionType.REVIEWS_SUCCESS;
-  payload: ReviewInfo[];
+  payload: { reviews: ReviewInfo[]; roomId: string };
 }
 
 export interface ReviewsResetFailAction extends BaseAction {
