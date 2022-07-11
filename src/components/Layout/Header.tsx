@@ -61,7 +61,17 @@ export function Header(): JSX.Element {
   useEffect((): void => {
     if (error) {
       if (error.errormsg !== 'Session not found') {
-        toast.error(error.errormsg);
+        if (error.errormsg !== 'User not found with this ID') {
+          toast.error(error.errormsg);
+          return;
+        }
+        // remove remnants of leftover cookies
+        // eslint-disable-next-line @typescript-eslint/no-var-requires
+        const sessionCookie = require('js-cookie');
+        sessionCookie.remove('next-auth.session-token');
+        sessionCookie.remove('next-auth.csrf-token');
+        sessionCookie.remove('userInfo');
+        sessionCookie.remove('next-auth.callback-url');
       }
     }
   }, [error]);
