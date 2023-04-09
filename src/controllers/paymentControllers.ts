@@ -30,8 +30,14 @@ const stripeCheckoutSession = async (req: NextApiRequest, res: NextApiResponse):
   // Get stripe checkout session
   const session = await stripe.checkout.sessions.create({
     payment_method_types: ['card'],
-    success_url: `${urlObject.protocol}//${urlObject.host}/bookings/me`,
-    cancel_url: `${urlObject.protocol}//${urlObject.host}/rooms/${room._id}`,
+    // success_url: `${urlObject.protocol}//${urlObject.host}/bookings/me`,
+    // cancel_url: `${urlObject.protocol}//${urlObject.host}/rooms/${room._id}`,
+    success_url: `https//vercelbookit.vercel.app/bookings/me`, ////// hard code otherwise at vercel, stripe will hit 400 error below
+    ////// 400 ERR -> url_invalid - success_url, The success_url parameter must correspond to a valid URL.
+    ////// POST
+    ////// /v1/checkout/sessions
+    ////// "success_url": "null//null/bookings/me", NOTE, THIS OCCURS AT VERCEL.COM
+    cancel_url: `https//vercelbookit.vercel.app/rooms/${room._id}`, ////// ditto cancel_url
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     customer_email: (req as any).user.email,
     client_reference_id: req.query.roomId,
